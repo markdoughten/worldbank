@@ -1,0 +1,1 @@
+https://api.worldbank.org/v2/en/country/SLB/indicator/NY.GDP.MKTP.CD?format=json
