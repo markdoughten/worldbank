@@ -1,1 +1,10 @@
-https://api.worldbank.org/v2/en/country/SLB/indicator/NY.GDP.MKTP.CD?format=json
+#general
+https://api.worldbank.org
+
+1. Probably going to need to request 1 per page to get the total value and make a second request for the full amount for countries and GDP data
+
+#dictionary for all the countries
+https://api.worldbank.org/v2/country/?format=json&page=1&per_page=299
+
+#solomon islands gdp (slb) is the variable
+https://api.worldbank.org/v2/en/country/SLB/indicator/NY.GDP.MKTP.CD?format=json&per_page=62
