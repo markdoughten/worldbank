@@ -1,0 +1,56 @@
+Alternative energy advantages and disadvantages
+
+Renewable energy
+    -Advantages
+        * the fuel cost is zero
+The primary benefit to renewable energy is that the source is relatively cheap when compared to traditional energy sources, coal, oil, and natural gas. A renewable energy's project is entirely capital expenditures because the fuel is inexpensive.
+        * the emissions are low
+The second advantage is that emissions are not considered material and drastically better than traditional energy. The exception is biomass because the burning emits CO2 into the atmosphere. The process is considered carbon negative because fuel crops consume C02 during growth. That offsets the carbon released during the burning. Also, studies show that carbon released during burning is cleaner than traditional fuel.       
+    -Disadvantages
+        * technical support on failures
+The first drawback with renewable energy is the constant maintence and the need for skilled labor. The technical requirement is a setback for locations without the proper educational system to train workers for the role. In the United States, there are effort to train young adults the basics required to service solar panels at homes. This requires additional investment into providing ad
+        * batteries required for intermittent sources 
+
+Solar energy
+    -Advantages
+        * very protable (do not require a main grid)
+        * easy to setup initially
+        * lightweight
+    -Disadvantages
+        * maintence (cleaning the surfaces)
+        * needs sunlight
+        * batteries required to store energy
+
+Biomass
+    -Advantages
+        * recycle plant material
+        * the material is relatively easy to source
+        * CO2 released is absorbed for plant growth so more sustaible than fossil fuels
+    -Disadvantages
+        * complex fuel process that requires a facility
+        * releases the same CO2 as fossil fuel emissions
+        * changing land into fuel crop production
+
+Wind
+    -Advantages
+        * not that technical to maintain once constructed
+        * can get deployed outside cities and in rural communities alike
+        * the wind is everywhere hot or cold climates
+    -Disadvantages
+        * dependent on wind speed for power generation, intermittent source
+        * not well recieved and considered an eye sore
+        * hazardous to some birds and bats
+
+Hydroelectric
+    -Advantages
+        * not intermittent
+        * straightforward design and fuel source
+        * easy maintence
+    -Disadvantages
+        * Access to waterways
+        * Costly to build a dam
+        * the cost related to disrupting the local ecosystem
+
+Links:
+    -http://needtoknow.nas.edu/energy/energy-sources/renewable-sources
+
