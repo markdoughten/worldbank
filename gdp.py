@@ -20,11 +20,21 @@ def chart(title, df, x, y):
 def print_prompt():
     """Print a message on startup to the user"""
     
-    pass
+    # print a welcome message to the console for the user
+    welcome = "welcome to the gdp tool!\n"
 
+    # a basic description about the application
+    description = "an application that allows users to look up countries based on code to see change in gdp"
+
+    # a could syntax examples
+    examples = "example commands:\n" + ":gdp slb\n" + ":exit\n" + ":help"
+    
+    return welcome + description + examples
+ 
 def get_line():
     """Record input from the user"""
-
+    
+    # print : and get input from the user
     line = input(': ')
     tokenized = line.split()
 
@@ -33,6 +43,7 @@ def get_line():
 def user_help():
     """Return the commands to the user"""
     
+    # a list of all the commands currently available
     built_in = {'dictionary': 'return the country to country code mapping', 'gdp': 'gdp <country code>', 'exit': 'exit the program'}
     
     return built_in
@@ -82,7 +93,7 @@ def load_gdp(country_code):
     country = gdp[1][1]['country']['value']
     
     # generate the title
-    title =   
+    title =  country + " - " + units 
     
     # call the chart function to build the chart
     chart(title, df, x, y)       
@@ -115,21 +126,6 @@ def load_json(file):
     # return data
     return data
 
-
-if __name__ == "__main__":
-    
-    # file name
-    file = 'gdp.csv'
-    country = 'Solomon Islands'
-    title = 'GDP (current US$) - ' + country
-    
-    # load data
-    df = pd.read_csv(file)
-    x, y = df[df.columns[0]], df[df.columns[1]]
-     
-    # mark chart
-    chart(title, df, x, y)
-
 if __name__ == '__main__':
     
     # start the loop for the user
@@ -139,19 +135,19 @@ if __name__ == '__main__':
         user = get_line()
 
         # loop through the get the response from the user
-        for commands in user:
+        for string in line:
 
             # print the avaiable commands
-            if commands[0] == 'help':
+            if string[0] == 'help':
                 user_help()
 
             # execute the gdp command
-            elif commands[0] == 'gdp':
-                gdp(commands[1])
+            elif string[0] == 'gdp':
+                gdp(upper(string[1]))
             
             # exit the program
-            elif commands[0] == 'exit':
-                return 
+            elif string[0] == 'exit':
+                False
             
             # provide the help command
             else:
