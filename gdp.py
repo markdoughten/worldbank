@@ -131,24 +131,24 @@ if __name__ == '__main__':
     # start the loop for the user
     while True:
         
+        # print prompt to the user
+        print_prompt()
+
         # get the input from the user
-        user = get_line()
+        line = get_line()
+        
+        # print the avaiable commands
+        if line[0] == 'help':
+            user_help()
 
-        # loop through the get the response from the user
-        for string in line:
-
-            # print the avaiable commands
-            if string[0] == 'help':
-                user_help()
-
-            # execute the gdp command
-            elif string[0] == 'gdp':
-                gdp(upper(string[1]))
-            
-            # exit the program
-            elif string[0] == 'exit':
-                False
-            
-            # provide the help command
-            else:
-                print('try: help')
+        # execute the gdp command
+        elif line[0] == 'gdp':
+            gdp(upper(string[1]))
+        
+        # exit the program
+        elif line[0] == 'exit':
+            False
+        
+        # provide the help command
+        else:
+            print('try: help')
