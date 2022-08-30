@@ -4,30 +4,33 @@ import pandas as pd
 import requests
 import json
 
-def chart(title, df, x, y):
+def chart(title, x, y):
     """Create a basic chart using x and y columns"""
 
     # instantiating a class     
     fig, ax = plt.subplots()
     
     # plot
+    ax.plot(x, y)
+    ax.set_xticks(np.arange(min(x), max(x), 5)
+    
+    # plot attributes
     plt.title(title)
-    ax.plot(x, y) 
     plt.show()
 
     return
 
-def print_prompt():
+def prompt():
     """Print a message on startup to the user"""
     
     # print a welcome message to the console for the user
     welcome = "welcome to the gdp tool!\n"
 
     # a basic description about the application
-    description = "an application that allows users to look up countries based on code to see change in gdp"
+    description = "an application that allows users to look up countries\n based on code to see change in gdp\n"
 
     # a could syntax examples
-    examples = "example commands:\n" + ":gdp slb\n" + ":exit\n" + ":help"
+    examples = "example commands:\n" + str(user_help())
     
     return welcome + description + examples
  
@@ -36,15 +39,18 @@ def get_line():
     
     # print : and get input from the user
     line = input(': ')
-    tokenized = line.split()
+    line = line.split()
 
-    return tokenized
+    return line
 
 def user_help():
     """Return the commands to the user"""
     
     # a list of all the commands currently available
-    built_in = {'dictionary': 'return the country to country code mapping', 'gdp': 'gdp <country code>', 'exit': 'exit the program'}
+    built_in = {'commands': [
+        {'codes': {'description': 'return the country to country code mapping'}}, 
+        {'gdp': {'syntax': 'gdp <country code>', 'description': 'return the country to country code mapping'}}, 
+        {'exit': {'description': 'exit the program'}}]}
     
     return built_in
 
@@ -71,46 +77,43 @@ def load_gdp(country_code):
     y = []
         
     # load the Solomon Islands GDP json
-    gdp = load_json('solomon-islands.json')
+    gdp = load_json('./json/solomon-islands.json')
     
     # store the data
     for data in gdp[1]:
 
-        # each data point in the set
-        for key in data:
-            
-            # store the x values
-            x.append(key['data'])
-            
-            # store the y values
-            y.append(key['value'])
-
+        # store the x values
+        x.append(int(data['date']))
+        
+        # store the y values
+        y.append(data['value'])
+    
+    # reverse the list data
+    x.reverse()
+    y.reverse()
 
     # get the units
-    units = gdp[1][1]['indicator']['value']
+    units = gdp[1][0]['indicator']['value']
 
     # get the country
-    country = gdp[1][1]['country']['value']
+    country = gdp[1][0]['country']['value']
+
+    df = pd.DataFrame({'years': x, 'gdp': y})   
     
     # generate the title
     title =  country + " - " + units 
     
     # call the chart function to build the chart
-    chart(title, df, x, y)       
+    chart(title, x, y)       
     
-    return 
+    return df
 
 def load_country_codes():
 
     # load JSON file
-    country_codes = load_json('dictionary.json')
-
-    # build dictionary based on country and country code
-    for codes in country_codes[1]:
-        for key in codes:
-            print(key['name'], key['id'])
-           
-    return 
+    country_codes = load_json('./json/dictionary.json')
+    
+    return country_codes 
 
 def load_json(file):
     
@@ -130,24 +133,44 @@ if __name__ == '__main__':
     
     # start the loop for the user
     while True:
-        
+       
         # get the input from the user
-        user = get_line()
+        line = get_line()
 
-        # loop through the get the response from the user
-        for string in line:
+        # convert to lower case
+        line = [x.lower() for x in line]
+        
+        if line:
 
-            # print the avaiable commands
-            if string[0] == 'help':
-                user_help()
+            # available commands
+            if line[0] == 'help':
+                print(user_help())
 
             # execute the gdp command
-            elif string[0] == 'gdp':
-                gdp(upper(string[1]))
+            elif line[0] == 'gdp':
+                load_gdp(line[1])
             
+            # load the country code mapping
+            elif line[0] == 'codes':
+                
+                # number labels            
+                counter = 0
+
+                # print the country codes
+                country_codes = load_country_codes()
+                
+                # build dictionary based on country and country code
+                for codes in country_codes[1]:
+                    
+                    # increment counter
+                    counter += 1
+                    
+                    # print to the console
+                    print(str(counter) + '. ' + codes['name'] + ': ' + codes['id'])
+                       
             # exit the program
-            elif string[0] == 'exit':
-                False
+            elif line[0] == 'exit':
+               break 
             
             # provide the help command
             else:
