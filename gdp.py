@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import requests
 import json
+import multiprocessing
 
 def chart(title, x, y, units):
     """Create a basic chart using x and y columns"""
@@ -156,6 +157,9 @@ def create_chart(command, indicator, units):
 
 if __name__ == '__main__':
     
+    # keep track of spawned process
+    processes = []
+        
     # start the loop for the user
     while True:
        
@@ -202,8 +206,6 @@ if __name__ == '__main__':
                 
                 # the percentage of population with electricity                                
                 indicator = '1.1_ACCESS.ELECTRICITY.TOT'
-                
-                # delete when connected to the API
                 indicator = './json/electricity.json'
                 
                 # create a chart based on the data            
