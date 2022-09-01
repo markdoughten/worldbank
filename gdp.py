@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
 import numpy as np 
 import pandas as pd
 import requests
 import json
+import multiprocessing
 
-def chart(title, x, y):
+def chart(title, x, y, units):
     """Create a basic chart using x and y columns"""
 
     # instantiating a class     
@@ -12,13 +14,28 @@ def chart(title, x, y):
     
     # plot
     ax.plot(x, y)
-    ax.set_xticks(np.arange(min(x), max(x), 5)
-    
+    ax.set_xticks(np.arange(min(x), max(x), 5))
+
+    # units
+    if units == '$':
+        ax.yaxis.set_major_formatter(currency)
+    elif units == '%':
+        ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=100))
+    else:
+        pass
+
     # plot attributes
     plt.title(title)
     plt.show()
 
     return
+
+def currency(x, pos):
+    """Format the currency values for the chart"""
+        
+    x = '${:1.1f}B'.format(x*1e-9)
+
+    return x    
 
 def prompt():
     """Print a message on startup to the user"""
@@ -68,19 +85,18 @@ def request():
 
     return response
 
-
-def load_gdp(country_code):
+def load(country_code, indicator):
     """Send GET request to the Word Bank API based on URL"""
         
     # set variables
     x = []
     y = []
         
-    # load the Solomon Islands GDP json
-    gdp = load_json('./json/solomon-islands.json')
+    # send a request to the API with the indicator
+    dataset = load_json(indicator)
     
     # store the data
-    for data in gdp[1]:
+    for data in dataset[1]:
 
         # store the x values
         x.append(int(data['date']))
@@ -93,22 +109,21 @@ def load_gdp(country_code):
     y.reverse()
 
     # get the units
-    units = gdp[1][0]['indicator']['value']
+    units = dataset[1][0]['indicator']['value']
 
     # get the country
-    country = gdp[1][0]['country']['value']
-
-    df = pd.DataFrame({'years': x, 'gdp': y})   
+    country = dataset[1][0]['country']['value']
+    
+    # create a dataframe based on json
+    df = pd.DataFrame({'date': x, 'value': y})   
     
     # generate the title
-    title =  country + " - " + units 
+    title =  country + " - " + units       
     
-    # call the chart function to build the chart
-    chart(title, x, y)       
-    
-    return df
+    return title, df, x, y
 
 def load_country_codes():
+    """Load the country codes from the World Bank API"""
 
     # load JSON file
     country_codes = load_json('./json/dictionary.json')
@@ -116,7 +131,8 @@ def load_country_codes():
     return country_codes 
 
 def load_json(file):
-    
+    """Opens up the local json file for testing and should get replaced with request"""
+
     # open the file
     f = open(file)
     
@@ -129,8 +145,21 @@ def load_json(file):
     # return data
     return data
 
+def create_chart(command, indicator, units):
+
+    # create a dataframe based on json request
+    title, df, x, y = load(command, indicator)
+               
+    # call the chart function to build the chart
+    chart(title, x, y, units) 
+    
+    return        
+
 if __name__ == '__main__':
     
+    # keep track of spawned process
+    processes = []
+        
     # start the loop for the user
     while True:
        
@@ -148,8 +177,13 @@ if __name__ == '__main__':
 
             # execute the gdp command
             elif line[0] == 'gdp':
-                load_gdp(line[1])
-            
+                
+                # gross domestic product
+                indicator = 'NY.GDP.MKTP.CD'
+                indicator = './json/solomon-islands.json'
+                            
+                create_chart('gdp', indicator, '$')
+    
             # load the country code mapping
             elif line[0] == 'codes':
                 
@@ -167,11 +201,29 @@ if __name__ == '__main__':
                     
                     # print to the console
                     print(str(counter) + '. ' + codes['name'] + ': ' + codes['id'])
-                       
+            
+            elif line[0] == 'electricity':
+                
+                # the percentage of population with electricity                                
+                indicator = '1.1_ACCESS.ELECTRICITY.TOT'
+                indicator = './json/electricity.json'
+                
+                # create a chart based on the data            
+                create_chart('electricity', indicator, '%')
+                
+            elif line[0] == 'population':
+                
+                # total population
+                indicator = 'NY.GDP.MKTP.CD'
+                indicator = './json/population.json'
+                
+                # create the chart            
+                create_chart('population', indicator, '')
+    
             # exit the program
             elif line[0] == 'exit':
                break 
             
-            # provide the help command
             else:
-                print('try: help')
+               # provide the help command
+               print('try: help')
