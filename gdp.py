@@ -235,13 +235,11 @@ if __name__ == '__main__':
         
         if line is None:
             break
+        
+        if line[0] == 'show':
+            for p in instances:
+                p.join()
 
         # create a process and submit the line to the interpreter
         p = multiprocessing.Process(target=interpreter, args=(line,))
         p.start()
-
-        # record before looping around
-        print(instances.append(p))
-        
-    for p in instances:
-        p.join()
