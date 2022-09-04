@@ -218,8 +218,11 @@ def interpreter(line):
 
     # exit the program
     elif line[0] == 'exit':
-        return False 
-    
+        return False
+
+    elif line[0] == 'show':
+        pass 
+ 
     else:
        # provide the help command
        print('try: help')
@@ -230,6 +233,7 @@ if __name__ == '__main__':
     instances = []
 
     while True: 
+        
         # load queue
         line = get_line()
         
@@ -243,3 +247,4 @@ if __name__ == '__main__':
         # create a process and submit the line to the interpreter
         p = multiprocessing.Process(target=interpreter, args=(line,))
         p.start()
+        instances.append(p)
