@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 import requests
 import json
-import multiprocessing
+import multiprocessing 
+import time
 
 def chart(title, x, y, units):
     """Create a basic chart using x and y columns"""
@@ -54,11 +55,21 @@ def prompt():
 def get_line():
     """Record input from the user"""
     
-    # print : and get input from the user
-    line = input(': ')
-    line = line.split()
+    # print : and get input from the user       
+    try:
+        line = input(': ')
+    except:
+        print('EOF')
 
-    return line
+    line = line.split()
+    
+    # convert to lower case
+    line = [x.lower() for x in line]
+    
+    if line[0] != 'exit':
+        return line
+    else:
+        return None
 
 def user_help():
     """Return the commands to the user"""
@@ -66,7 +77,8 @@ def user_help():
     # a list of all the commands currently available
     built_in = {'commands': [
         {'codes': {'description': 'return the country to country code mapping'}}, 
-        {'gdp': {'syntax': 'gdp <country code>', 'description': 'return the country to country code mapping'}}, 
+        {'gdp': {'syntax': 'gdp <country code>', 'description': 'return the target country\'s recorded gdp per year(USD)'}}, 
+        {'electricity': {'syntax': 'electricity <country code>', 'description': 'return the target country\'s recorded electriciy useage as percent of population'}}, 
         {'exit': {'description': 'exit the program'}}]}
     
     return built_in
@@ -155,75 +167,101 @@ def create_chart(command, indicator, units):
     
     return        
 
-if __name__ == '__main__':
+def interpreter(line):
+   
+    # available commands
+    if line[0] == 'help':
+        print(user_help())
     
-    # keep track of spawned process
+    # execute the gdp command
+    elif line[0] == 'gdp':
+        
+        # gross domestic product
+        indicator = 'NY.GDP.MKTP.CD'
+        indicator = './json/solomon-islands.json'
+                    
+        create_chart('gdp', indicator, '$')
+
+    # load the country code mapping
+    elif line[0] == 'codes':
+        
+        # number labels            
+        counter = 0
+
+        # print the country codes
+        country_codes = load_country_codes()
+        
+        # build dictionary based on country and country code
+        for codes in country_codes[1]:
+            
+            # increment counter
+            counter += 1
+            
+            # print to the console
+            print(str(counter) + '. ' + codes['name'] + ': ' + codes['id'])
+    
+    elif line[0] == 'electricity':
+        
+        # the percentage of population with electricity                                
+        indicator = '1.1_ACCESS.ELECTRICITY.TOT'
+        indicator = './json/electricity.json'
+        
+        # create a chart based on the data            
+        create_chart('electricity', indicator, '%')
+        
+    elif line[0] == 'population':
+        
+        # total population
+        indicator = 'NY.GDP.MKTP.CD'
+        indicator = './json/population.json'
+        
+        # create the chart            
+        create_chart('population', indicator, '')
+
+    # exit the program
+    elif line[0] == 'exit':
+        return None
+
+    elif line[0] == 'show':
+        pass 
+ 
+    else:
+       # provide the help command
+       print('try :help')
+
+
+def main():
+    
+    # record the created threads       
     processes = []
+
+    while True: 
         
-    # start the loop for the user
-    while True:
-       
-        # get the input from the user
+        # load queue
         line = get_line()
-
-        # convert to lower case
-        line = [x.lower() for x in line]
         
-        if line:
-
-            # available commands
-            if line[0] == 'help':
-                print(user_help())
-
-            # execute the gdp command
-            elif line[0] == 'gdp':
-                
-                # gross domestic product
-                indicator = 'NY.GDP.MKTP.CD'
-                indicator = './json/solomon-islands.json'
-                            
-                create_chart('gdp', indicator, '$')
-    
-            # load the country code mapping
-            elif line[0] == 'codes':
-                
-                # number labels            
-                counter = 0
-
-                # print the country codes
-                country_codes = load_country_codes()
-                
-                # build dictionary based on country and country code
-                for codes in country_codes[1]:
-                    
-                    # increment counter
-                    counter += 1
-                    
-                    # print to the console
-                    print(str(counter) + '. ' + codes['name'] + ': ' + codes['id'])
-            
-            elif line[0] == 'electricity':
-                
-                # the percentage of population with electricity                                
-                indicator = '1.1_ACCESS.ELECTRICITY.TOT'
-                indicator = './json/electricity.json'
-                
-                # create a chart based on the data            
-                create_chart('electricity', indicator, '%')
-                
-            elif line[0] == 'population':
-                
-                # total population
-                indicator = 'NY.GDP.MKTP.CD'
-                indicator = './json/population.json'
-                
-                # create the chart            
-                create_chart('population', indicator, '')
-    
-            # exit the program
-            elif line[0] == 'exit':
-               break 
-            
-            else:
-               # provide the help command
-               print('try: help')
+        if line is None:
+           for p in processes:
+               p.join()
+               p.close() 
+           exit()
+        
+        # record time to wait main
+        t1 = time.time() * 1000
+  
+        # create a process and submit the line to the interpreter
+        p = multiprocessing.Process(target=interpreter, args=(line,))
+        p.start()
+        processes.append(p)
+        
+        # get the difference
+        d = time.time() * 1000 - t1
+        
+        if 1 < (d/1000):
+            time.sleep(d)
+        else:
+            # hang main
+            time.sleep(1)       
+ 
+if __name__ == '__main__':
+    main()
