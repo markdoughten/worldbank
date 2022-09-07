@@ -5,6 +5,7 @@ import pandas as pd
 import requests
 import json
 import multiprocessing 
+import time
 
 def chart(title, x, y, units):
     """Create a basic chart using x and y columns"""
@@ -76,7 +77,8 @@ def user_help():
     # a list of all the commands currently available
     built_in = {'commands': [
         {'codes': {'description': 'return the country to country code mapping'}}, 
-        {'gdp': {'syntax': 'gdp <country code>', 'description': 'return the country to country code mapping'}}, 
+        {'gdp': {'syntax': 'gdp <country code>', 'description': 'return the target country\'s recorded gdp per year(USD)'}}, 
+        {'electricity': {'syntax': 'electricity <country code>', 'description': 'return the target country\'s recorded electriciy useage as percent of population'}}, 
         {'exit': {'description': 'exit the program'}}]}
     
     return built_in
@@ -218,19 +220,20 @@ def interpreter(line):
 
     # exit the program
     elif line[0] == 'exit':
-        return False
+        return None
 
     elif line[0] == 'show':
         pass 
  
     else:
        # provide the help command
-       print('try: help')
+       print('try :help')
 
-if __name__ == '__main__':
 
+def main():
+    
     # record the created threads       
-    instances = []
+    processes = []
 
     while True: 
         
@@ -238,13 +241,27 @@ if __name__ == '__main__':
         line = get_line()
         
         if line is None:
-            break
+           for p in processes:
+               p.join()
+               p.close() 
+           exit()
         
-        if line[0] == 'show':
-            for p in instances:
-                p.join()
-
+        # record time to wait main
+        t1 = time.time() * 1000
+  
         # create a process and submit the line to the interpreter
         p = multiprocessing.Process(target=interpreter, args=(line,))
         p.start()
-        instances.append(p)
+        processes.append(p)
+        
+        # get the difference
+        d = time.time() * 1000 - t1
+        
+        if 1 < (d/1000):
+            time.sleep(d)
+        else:
+            # hang main
+            time.sleep(1)       
+ 
+if __name__ == '__main__':
+    main()
