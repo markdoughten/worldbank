@@ -222,13 +222,9 @@ def interpreter(line):
     elif line[0] == 'exit':
         return None
 
-    elif line[0] == 'show':
-        pass 
- 
     else:
        # provide the help command
        print('try :help')
-
 
 def main():
     
