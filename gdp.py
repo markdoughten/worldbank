@@ -15,7 +15,7 @@ def chart(title, x, y, units):
     
     # plot
     ax.plot(x, y)
-    ax.set_xticks(np.arange(min(x), max(x), 5))
+    ax.set_xticks(np.arange(min(x), max(x), 10))
 
     # units
     if units == '$':
@@ -23,7 +23,7 @@ def chart(title, x, y, units):
     elif units == '%':
         ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=100))
     else:
-        ax.yaxis.set_major_formatter(units)
+        ax.yaxis.set_major_formatter(standard)
 
     # plot attributes
     plt.title(title)
@@ -40,7 +40,7 @@ def currency(x, pos):
         x = '${:1.1f}M'.format(x*1e-6)
     return x
 
-def units(x, pos):
+def standard(x, pos):
     """Format regular values"""
     
     if x >= 1e9:    
@@ -53,10 +53,10 @@ def prompt():
     """Print a message on startup to the user"""
     
     # print a welcome message to the console for the user
-    welcome = "welcome to the gdp tool!\n"
+    welcome = "welcome to the country lookup tool\n"
 
     # a basic description about the application
-    description = "an application that allows users to look up country data based on code to see change in gdp\n"
+    description = "an application for visualizing specific country data"
 
     return welcome + description
       
@@ -79,18 +79,25 @@ def get_line():
     else:
         return None
 
-def user_help():
+def user_help(request='all'):
     """Return the commands to the user"""
     
     # a list of all the commands currently available
-    built_in = {'commands': [
-        {'codes': {'description': 'return the country to country code mapping'}}, 
-        {'gdp': {'syntax': 'gdp <country code>', 'description': 'return the target country\'s recorded gdp per year(USD)'}}, 
-        {'electricity': {'syntax': 'electricity <country code>', 'description': 'return the target country\'s recorded electriciy access as percent of population'}}, 
-        {'population': {'syntax': 'population <country code>', 'description': 'return the target country\'s recorded population'}}, 
-        {'exit': {'description': 'exit the program'}}]}
-    
-    return built_in
+    commands = {
+        'codes': {'description': 'return the country to country code mapping'}, 
+        'gdp': {'syntax': 'gdp <country code>', 'description': 'return the target country\'s recorded gdp per year(USD)'}, 
+        'electricity': {'syntax': 'electricity <country code>', 'description': 'return the target country\'s recorded electriciy access as percent of population'}, 
+        'population': {'syntax': 'population <country code>', 'description': 'return the target country\'s recorded population'}, 
+        'exit': {'description': 'exit the program'}
+        }
+
+    if request == 'all':
+        return commands
+    else:
+        # the specific description and syntax
+        for command in commands:
+               pass
+        return commands
 
 def request_data(country_code, indicator):
     """Send GET request to the Word Bank API based on URL"""
@@ -173,11 +180,17 @@ def interpreter(line):
 
     # exit the program
     if line[0] == 'exit':
-        return None
+        return False
     
     # available commands
     elif line[0] == 'help':
-        print(user_help())
+       
+        try: 
+            print(user_help(line[1]))
+        except IndexError:
+            print(user_help('all'))
+        
+        return
     
     # load the country code mapping
     elif line[0] == 'codes':
@@ -192,6 +205,8 @@ def interpreter(line):
         for codes in country_codes[1]:
             counter += 1
             print(str(counter) + '. ' + codes['name'] + ': ' + codes['id'])
+
+        return
     
     # validate the line has a country code
     elif validation(line) == False:
@@ -206,6 +221,8 @@ def interpreter(line):
         # generate the chart
         create_chart(line[1], indicator, '$')
 
+        return
+
     elif line[0] == 'electricity':
         
         # the percentage of population with electricity                                
@@ -213,6 +230,8 @@ def interpreter(line):
         
         # create a chart based on the data            
         create_chart(line[1], indicator, '%')
+
+        return
         
     elif line[0] == 'population':
         
@@ -222,20 +241,29 @@ def interpreter(line):
         # create the chart            
         create_chart(line[1], indicator, '')
 
+        return
+
     else:
        # provide the help command
-       print('try :help')
+       print(': help <command>')
+        
+    return
 
 def main():
     
-    # record the created threads       
+    # record the created processes       
     processes = []
+
+    # print prompt
+    print(prompt())
     
     while True: 
         
         # load queue
         line = get_line()
         
+        print(line)
+ 
         # exit the program and join processes 
         if line is None:
            for p in processes:
@@ -249,7 +277,7 @@ def main():
         p.start()
         
         # hang main so chart can get produced 
-        time.sleep(1)
+        time.sleep(2)
  
 if __name__ == '__main__':
     main()
