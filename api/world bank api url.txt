@@ -11,6 +11,8 @@ https://api.worldbank.org/v2/country/?format=json&page=1&per_page=299
 https://api.worldbank.org/v2/en/country/SLB/indicator/NY.GDP.MKTP.CD?format=json&per_page=62
 
 #possible indicators
+https://api.worldbank.org/v2/en/indicator/?format=json
+
 1.1_ACCESS.ELECTRICITY.TOT - electricity
 
 NY.GDP.MKTP.CD - gdp
