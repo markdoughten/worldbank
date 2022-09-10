@@ -15,7 +15,7 @@ def chart(title, x, y, units):
     
     # plot
     ax.plot(x, y)
-    ax.set_xticks(np.arange(min(x), max(x), 5))
+    ax.set_xticks(np.arange(min(x), max(x), 10))
 
     # units
     if units == '$':
@@ -23,7 +23,7 @@ def chart(title, x, y, units):
     elif units == '%':
         ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=100))
     else:
-        pass
+        ax.yaxis.set_major_formatter(standard)
 
     # plot attributes
     plt.title(title)
@@ -33,25 +33,33 @@ def chart(title, x, y, units):
 
 def currency(x, pos):
     """Format the currency values for the chart"""
-        
-    x = '${:1.1f}B'.format(x*1e-9)
+    
+    if x >= 1e9:    
+        x = '${:1.1f}B'.format(x*1e-9)
+    else:
+        x = '${:1.1f}M'.format(x*1e-6)
+    return x
 
-    return x    
+def standard(x, pos):
+    """Format regular values"""
+    
+    if x >= 1e9:    
+        x = '{:1.1f}B'.format(x*1e-9)
+    else:
+        x = '{:1.1f}M'.format(x*1e-6)
+    return x
 
 def prompt():
     """Print a message on startup to the user"""
     
     # print a welcome message to the console for the user
-    welcome = "welcome to the gdp tool!\n"
+    welcome = "welcome to the country lookup tool\n"
 
     # a basic description about the application
-    description = "an application that allows users to look up countries\n based on code to see change in gdp\n"
+    description = "an application for visualizing specific country data"
 
-    # a could syntax examples
-    examples = "example commands:\n" + str(user_help())
-    
-    return welcome + description + examples
- 
+    return welcome + description
+      
 def get_line():
     """Record input from the user"""
     
@@ -71,31 +79,45 @@ def get_line():
     else:
         return None
 
-def user_help():
+def user_help(request='all'):
     """Return the commands to the user"""
     
     # a list of all the commands currently available
-    built_in = {'commands': [
-        {'codes': {'description': 'return the country to country code mapping'}}, 
-        {'gdp': {'syntax': 'gdp <country code>', 'description': 'return the target country\'s recorded gdp per year(USD)'}}, 
-        {'electricity': {'syntax': 'electricity <country code>', 'description': 'return the target country\'s recorded electriciy useage as percent of population'}}, 
-        {'exit': {'description': 'exit the program'}}]}
-    
-    return built_in
+    commands = {
+        'codes': {'description': 'return the country to country code mapping'}, 
+        'gdp': {'syntax': 'gdp <country code>', 'description': 'return the target country\'s recorded gdp per year(USD)'}, 
+        'electricity': {'syntax': 'electricity <country code>', 'description': 'return the target country\'s recorded electriciy access as percent of population'}, 
+        'population': {'syntax': 'population <country code>', 'description': 'return the target country\'s recorded population'}, 
+        'exit': {'description': 'exit the program'}
+        }
 
-def request():
+    if request == 'all':
+        return commands
+    else:
+        # the specific description and syntax
+        for command in commands:
+               pass
+        return commands
+
+def request_data(country_code, indicator):
     """Send GET request to the Word Bank API based on URL"""
     
-    url = 'https://prices.runescape.wiki/api/v1/osrs'
+    url = f'https://api.worldbank.org/v2/en/country/{country_code}/indicator/{indicator}?format=json&per_page=32700'
+    
+    response = requests.get(url)
 
-    headers = {
-        'User-Agent': 'My User Agent 1.0',
-        'From': 'youremail@domain.com'  # This is another valid field
-    }
+    return response.json()
 
-    response = requests.get(url, headers=headers)
+def request_country_codes():
+    """Load the country codes from the World Bank API"""
+    
+    # country code url    
+    url = 'https://api.worldbank.org/v2/country/?format=json&page=1&per_page=2000'
 
-    return response
+    # request the World Bank API for country codes
+    response = requests.get(url)
+    
+    return response.json() 
 
 def load(country_code, indicator):
     """Send GET request to the Word Bank API based on URL"""
@@ -105,7 +127,7 @@ def load(country_code, indicator):
     y = []
         
     # send a request to the API with the indicator
-    dataset = load_json(indicator)
+    dataset = request_data(country_code, indicator)
     
     # store the data
     for data in dataset[1]:
@@ -134,54 +156,42 @@ def load(country_code, indicator):
     
     return title, df, x, y
 
-def load_country_codes():
-    """Load the country codes from the World Bank API"""
-
-    # load JSON file
-    country_codes = load_json('./json/dictionary.json')
-    
-    return country_codes 
-
-def load_json(file):
-    """Opens up the local json file for testing and should get replaced with request"""
-
-    # open the file
-    f = open(file)
-    
-    # load the json data
-    data = json.load(f)
-
-    # close the file
-    f.close()
-    
-    # return data
-    return data
-
-def create_chart(command, indicator, units):
+def create_chart(country_code, indicator, units):
 
     # create a dataframe based on json request
-    title, df, x, y = load(command, indicator)
+    title, df, x, y = load(country_code, indicator)
                
     # call the chart function to build the chart
     chart(title, x, y, units) 
     
-    return        
+    return
 
+def validation(line):
+    """Validate a country code is used before sending off to API"""    
+ 
+    try:
+        line[1]
+    except IndexError:
+        print(f"please use the following syntax: {line[0]} <country_code>\nlist of country codes : codes" )
+        return False
+ 
 def interpreter(line):
-   
-    # available commands
-    if line[0] == 'help':
-        print(user_help())
-    
-    # execute the gdp command
-    elif line[0] == 'gdp':
-        
-        # gross domestic product
-        indicator = 'NY.GDP.MKTP.CD'
-        indicator = './json/solomon-islands.json'
-                    
-        create_chart('gdp', indicator, '$')
+    """Interprets each line passed from the user and routes to next steps for the application"""
 
+    # exit the program
+    if line[0] == 'exit':
+        return False
+    
+    # available commands
+    elif line[0] == 'help':
+       
+        try: 
+            print(user_help(line[1]))
+        except IndexError:
+            print(user_help('all'))
+        
+        return
+    
     # load the country code mapping
     elif line[0] == 'codes':
         
@@ -189,79 +199,85 @@ def interpreter(line):
         counter = 0
 
         # print the country codes
-        country_codes = load_country_codes()
+        country_codes = request_country_codes()
         
         # build dictionary based on country and country code
         for codes in country_codes[1]:
-            
-            # increment counter
             counter += 1
-            
-            # print to the console
             print(str(counter) + '. ' + codes['name'] + ': ' + codes['id'])
+
+        return
     
+    # validate the line has a country code
+    elif validation(line) == False:
+        return 
+         
+    # execute the gdp command
+    elif line[0] == 'gdp':
+         
+        # gross domestic product
+        indicator = 'NY.GDP.MKTP.CD'
+        
+        # generate the chart
+        create_chart(line[1], indicator, '$')
+
+        return
+
     elif line[0] == 'electricity':
         
         # the percentage of population with electricity                                
         indicator = '1.1_ACCESS.ELECTRICITY.TOT'
-        indicator = './json/electricity.json'
         
         # create a chart based on the data            
-        create_chart('electricity', indicator, '%')
+        create_chart(line[1], indicator, '%')
+
+        return
         
     elif line[0] == 'population':
         
         # total population
-        indicator = 'NY.GDP.MKTP.CD'
-        indicator = './json/population.json'
+        indicator = 'SP.POP.TOTL'
         
         # create the chart            
-        create_chart('population', indicator, '')
+        create_chart(line[1], indicator, '')
 
-    # exit the program
-    elif line[0] == 'exit':
-        return None
+        return
 
-    elif line[0] == 'show':
-        pass 
- 
     else:
        # provide the help command
-       print('try :help')
-
+       print(': help <command>')
+        
+    return
 
 def main():
     
-    # record the created threads       
+    # record the created processes       
     processes = []
 
+    # print prompt
+    print(prompt())
+    
     while True: 
         
         # load queue
         line = get_line()
         
+        print(line)
+ 
+        # exit the program and join processes 
         if line is None:
            for p in processes:
                p.join()
                p.close() 
            exit()
         
-        # record time to wait main
-        t1 = time.time() * 1000
-  
         # create a process and submit the line to the interpreter
         p = multiprocessing.Process(target=interpreter, args=(line,))
-        p.start()
         processes.append(p)
+        p.start()
         
-        # get the difference
-        d = time.time() * 1000 - t1
-        
-        if 1 < (d/1000):
-            time.sleep(d)
-        else:
-            # hang main
-            time.sleep(1)       
+        # hang main so chart can get produced 
+        time.sleep(2)
  
 if __name__ == '__main__':
     main()
