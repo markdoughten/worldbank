@@ -34,7 +34,9 @@ def chart(title, x, y, units):
 def currency(x, pos):
     """Format the currency values for the chart"""
     
-    if x >= 1e9:    
+    if x >= 1e12:    
+        x = '${:1.1f}T'.format(x*1e-12)
+    elif x >= 1e9:
         x = '${:1.1f}B'.format(x*1e-9)
     else:
         x = '${:1.1f}M'.format(x*1e-6)
@@ -95,9 +97,7 @@ def user_help(request='all'):
         return commands
     else:
         # the specific description and syntax
-        for command in commands:
-               pass
-        return commands
+        return commands[request]
 
 def request_data(country_code, indicator):
     """Send GET request to the Word Bank API based on URL"""
@@ -182,16 +182,6 @@ def interpreter(line):
     if line[0] == 'exit':
         return False
     
-    # available commands
-    elif line[0] == 'help':
-       
-        try: 
-            print(user_help(line[1]))
-        except IndexError:
-            print(user_help('all'))
-        
-        return
-    
     # load the country code mapping
     elif line[0] == 'codes':
         
@@ -208,11 +198,21 @@ def interpreter(line):
 
         return
     
+    # available commands
+    elif line[0] == 'help':
+       
+        try: 
+            print(user_help(line[1]))
+        except IndexError:
+            print(user_help('all'))
+        
+        return
+    
     # validate the line has a country code
     elif validation(line) == False:
         return 
-         
-    # execute the gdp command
+    
+        # execute the gdp command
     elif line[0] == 'gdp':
          
         # gross domestic product
@@ -245,7 +245,7 @@ def interpreter(line):
 
     else:
        # provide the help command
-       print(': help <command>')
+       print('try : help <command> or : help')
         
     return
 
@@ -255,15 +255,13 @@ def main():
     processes = []
 
     # print prompt
-    print(prompt())
+    # print(prompt())
     
     while True: 
         
         # load queue
         line = get_line()
         
-        print(line)
- 
         # exit the program and join processes 
         if line is None:
            for p in processes:
