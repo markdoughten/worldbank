@@ -18,25 +18,6 @@ def validation(line):
         print(f"please use the following syntax: {line[0]} <country_code>\nlist of country codes : codes" )
         return False
 
-def get_line():
-    """Record input from the user"""
-    
-    # print : and get input from the user       
-    try:
-        line = input(': ')
-    except:
-        print('EOF')
-
-    line = line.split()
-    
-    # convert to lower case
-    line = [x.lower() for x in line]
-    
-    if line[0] != 'exit':
-        return line
-    else:
-        return None
-
 def interpreter(line):
     """Interprets each line passed from the user and routes to next steps for the application"""
 

@@ -25,7 +25,7 @@ def get_line():
     # convert to lower case
     line = [x.lower() for x in line]
     
-    if line[0] != 'exit' or line[0] != '':
+    if line[0] != 'exit':
         return line
     else:
         return None
