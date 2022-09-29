@@ -10,34 +10,26 @@ import requests
 import json
 import multiprocessing 
 import time
+import sys
 
 def main():
     
     # record the created processes       
     processes = []
-
-    # print prompt
-    print(menu.prompt())
     
-    while True: 
-        
-        # load queue
-        line = menu.get_line()
+    # remove the file name
+    sys.argv.pop(0)    
+ 
+    # timer
+    start = time.time()
 
-        # exit the program and join processes 
-        if line is None:
-           for p in processes:
-               p.join()
-               p.close() 
-           exit()
-        
-        # create a process and submit the line to the interpreter
-        p = multiprocessing.Process(target=app.interpreter, args=(line,))
-        processes.append(p)
-        p.start()
-        
-        # hang main so chart can get produced 
-        time.sleep(2)
+    # create a process and submit the line to the interpreter
+    p = multiprocessing.Process(target=app.interpreter, args=(sys.argv,))
+    processes.append(p)
+    p.start()
+    
+    # hang main so chart can get produced 
+    time.sleep(time.time()-start)
  
 if __name__ == '__main__':
     main()
