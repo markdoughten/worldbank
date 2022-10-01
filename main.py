@@ -19,17 +19,24 @@ def main():
     
     # remove the file name
     sys.argv.pop(0)    
- 
-    # timer
-    start = time.time()
-
-    # create a process and submit the line to the interpreter
-    p = multiprocessing.Process(target=app.interpreter, args=(sys.argv,))
-    processes.append(p)
-    p.start()
     
-    # hang main so chart can get produced 
-    time.sleep(time.time()-start)
+    pairs = generate_pairs(sys.argv)
+    
+    # loop through command passed to the script
+    for pair in pairs: 
+        
+        # timer
+        start = time.time()
+        
+        # create a process and submit the line to the interpreter
+        p = multiprocessing.Process(target=app.interpreter, args=(pair,))
+        processes.append(p)
+        p.start()
+        
+        # hang main so chart can get produced 
+        time.sleep(time.time()-start)
+
+    exit()
  
 if __name__ == '__main__':
     main()

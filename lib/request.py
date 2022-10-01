@@ -11,10 +11,14 @@ import json
 import multiprocessing 
 import time
 
-def request_data(country_code, indicator):
-    """Send GET request to the Word Bank API based on URL"""
+def generate_url(country_code, indicator)
     
     url = f'https://api.worldbank.org/v2/en/country/{country_code}/indicator/{indicator}?format=json&per_page=32700'
+    
+    return url
+
+def request_data(url):
+    """Send GET request to the Word Bank API based on URL"""
     
     response = requests.get(url)
 
@@ -39,7 +43,9 @@ def load(country_code, indicator):
     y = []
         
     # send a request to the API with the indicator
-    dataset = request_data(country_code, indicator)
+    url = generate_url(country_code, indicator)
+    
+    dataset = request_data(url)
     
     # store the data
     for data in dataset[1]:
