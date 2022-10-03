@@ -14,7 +14,7 @@ import time
 def create_chart(country_code, indicator, units):
 
     # create a dataframe based on json request
-    title, df, x, y = request.load(country_code, indicator)
+    title, df, x, y = request.country_data(country_code, indicator)
                
     # call the chart function to build the chart
     chart(title, x, y, units) 

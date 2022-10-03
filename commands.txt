@@ -6,6 +6,8 @@ usa electricity population
 
 command = [slb, gdp, electricity, population]
 
+if command[0] != codes or help
+
 country_code = command.pop(0)
 
 pairs = []

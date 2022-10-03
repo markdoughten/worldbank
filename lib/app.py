@@ -34,10 +34,10 @@ def interpreter(pair):
     """Interprets each line passed from the user and routes to next steps for the application"""
     
     # load the country code mapping
-    if pair[1] == 'codes':
+    if pair[0] == 'codes':
        
         # request the country codes
-        country_codes = request.load()
+        country_codes = request.country_codes()
 
         return country_codes
     
@@ -55,34 +55,34 @@ def interpreter(pair):
     elif validation(pair) == False:
         return 
     
-        # execute the gdp command
-    elif pair[0] == 'gdp':
+    # execute the gdp command
+    elif pair[1] == 'gdp':
          
         # gross domestic product
         indicator = 'NY.GDP.MKTP.CD'
         
         # generate the chart
-        chart.create_chart(pair[1], indicator, '$')
+        chart.create_chart(pair[0], indicator, '$')
 
         return
 
-    elif pair[0] == 'electricity':
+    elif pair[1] == 'electricity':
         
         # the percentage of population with electricity                                
         indicator = '1.1_ACCESS.ELECTRICITY.TOT'
         
         # create a chart based on the data            
-        chart.create_chart(pair[1], indicator, '%')
+        chart.create_chart(pair[0], indicator, '%')
 
         return
         
-    elif pair[0] == 'population':
+    elif pair[1] == 'population':
         
         # total population
         indicator = 'SP.POP.TOTL'
         
         # create the chart            
-        chart.create_chart(pair[1], indicator, '')
+        chart.create_chart(pair[0], indicator, '')
 
         return
 

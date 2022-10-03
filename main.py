@@ -19,8 +19,11 @@ def main():
     
     # remove the file name
     sys.argv.pop(0)    
-    
-    pairs = generate_pairs(sys.argv)
+   
+    if sys.argv[0] == 'codes' or sys.argv[0] == 'help':  
+        pairs = [sys.argv]
+    else:
+        pairs = generate_pairs(sys.argv)
     
     # loop through command passed to the script
     for pair in pairs: 
