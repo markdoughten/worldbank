@@ -23,8 +23,10 @@ def main():
     if sys.argv[0] == 'codes' or sys.argv[0] == 'help':  
         pairs = [sys.argv]
     else:
-        pairs = generate_pairs(sys.argv)
+        pairs = app.generate_pairs(sys.argv)
     
+    print(pairs) 
+
     # loop through command passed to the script
     for pair in pairs: 
         

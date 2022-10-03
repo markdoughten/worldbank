@@ -38,9 +38,11 @@ def interpreter(pair):
        
         # request the country codes
         country_codes = request.country_codes()
+        
+        print(country_codes.to_string(index=False))
 
-        return country_codes
-    
+        return  
+   
     # available commands
     elif pair[0] == 'help':
        
