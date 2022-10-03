@@ -9,99 +9,82 @@ import json
 import multiprocessing 
 import time
 
-def validation(line):
+def generate_pairs(command):
+    """Returns the pairs passed through the command line"""
+    
+    country_code = command.pop(0)
+    pairs = []
+    
+    for code in command:
+        pairs.append([country_code, code])
+
+    return pairs
+
+
+def validation(pair):
     """Validate a country code is used before sending off to API"""    
  
     try:
-        line[1]
+        pair[1]
     except IndexError:
-        print(f"please use the following syntax: {line[0]} <country_code>\nlist of country codes : codes" )
+        print(f"please use the following syntax: {pair[0]} <country_code>\nlist of country codes : codes" )
         return False
 
-def get_line():
-    """Record input from the user"""
-    
-    # print : and get input from the user       
-    try:
-        line = input(': ')
-    except:
-        print('EOF')
-
-    line = line.split()
-    
-    # convert to lower case
-    line = [x.lower() for x in line]
-    
-    if line[0] != 'exit':
-        return line
-    else:
-        return None
-
-def interpreter(line):
+def interpreter(pair):
     """Interprets each line passed from the user and routes to next steps for the application"""
-
-    # exit the program
-    if line[0] == 'exit':
-        return False
     
     # load the country code mapping
-    elif line[0] == 'codes':
+    if pair[0] == 'codes':
+       
+        # request the country codes
+        country_codes = request.country_codes()
         
-        # number labels            
-        counter = 0
+        print(country_codes.to_string(index=False))
 
-        # print the country codes
-        country_codes = request.request_country_codes()
-        
-        # build dictionary based on country and country code
-        for codes in country_codes[1]:
-            counter += 1
-            print(str(counter) + '. ' + codes['name'] + ': ' + codes['id'])
-
-        return
-    
+        return  
+   
     # available commands
-    elif line[0] == 'help':
+    elif pair[0] == 'help':
        
         try: 
-            print(menu.user_help(line[1]))
+            print(menu.user_help(pair[1]))
         except IndexError:
             print(menu.user_help('all'))
         
         return
     
     # validate the line has a country code
-    elif validation(line) == False:
+    elif validation(pair) == False:
         return 
     
-        # execute the gdp command
-    elif line[0] == 'gdp':
+    # execute the gdp command
+    elif pair[1] == 'gdp':
          
         # gross domestic product
         indicator = 'NY.GDP.MKTP.CD'
         
         # generate the chart
-        chart.create_chart(line[1], indicator, '$')
+        chart.create_chart(pair[0], indicator, '$')
 
         return
 
-    elif line[0] == 'electricity':
+    elif pair[1] == 'electricity':
         
         # the percentage of population with electricity                                
         indicator = '1.1_ACCESS.ELECTRICITY.TOT'
         
         # create a chart based on the data            
-        chart.create_chart(line[1], indicator, '%')
+        chart.create_chart(pair[0], indicator, '%')
 
         return
         
-    elif line[0] == 'population':
+    elif pair[1] == 'population':
         
         # total population
         indicator = 'SP.POP.TOTL'
         
         # create the chart            
-        chart.create_chart(line[1], indicator, '')
+        chart.create_chart(pair[0], indicator, '')
 
         return
 

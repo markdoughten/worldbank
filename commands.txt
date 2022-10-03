@@ -1,0 +1,28 @@
+slb gdp electricity population
+usa electricity population
+
+1. [main.py, slb, gdp, electricity, population]
+2. [main.py, codes]
+
+command = [slb, gdp, electricity, population]
+
+if command[0] != codes or help
+
+country_code = command.pop(0)
+
+pairs = []
+
+for code in command:
+	pairs.append([country_code, code])
+
+return pairs
+
+Order:
+1. pop the file name off in main
+2. pass the subsections to the interpreter [slb, gdp], [slb, electricity], [slb, population]
+3. pop the tail off and reference position list[0] for country 
+4. for each indicator until len = 1.
+
+To do:
+1. load the country codes in a dataframe
+2. handle "codes" command

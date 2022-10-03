@@ -11,35 +11,32 @@ import json
 import multiprocessing 
 import time
 
-def request_data(country_code, indicator):
-    """Send GET request to the Word Bank API based on URL"""
+def get_url(country_code, indicator):
     
     url = f'https://api.worldbank.org/v2/en/country/{country_code}/indicator/{indicator}?format=json&per_page=32700'
+    
+    return url
+
+def get_data(url):
+    """Send GET request to the Word Bank API based on URL"""
     
     response = requests.get(url)
 
     return response.json()
 
-def request_country_codes():
-    """Load the country codes from the World Bank API"""
-    
-    # country code url    
-    url = 'https://api.worldbank.org/v2/country/?format=json&page=1&per_page=2000'
-
-    # request the World Bank API for country codes
-    response = requests.get(url)
-    
-    return response.json() 
-
-def load(country_code, indicator):
+def country_data(country_code, indicator):
     """Send GET request to the Word Bank API based on URL"""
         
     # set variables
     x = []
     y = []
-        
+    url = ''
+
     # send a request to the API with the indicator
-    dataset = request_data(country_code, indicator)
+    url = get_url(country_code, indicator)
+    
+    # request country data
+    dataset = get_data(url)
     
     # store the data
     for data in dataset[1]:
@@ -67,4 +64,23 @@ def load(country_code, indicator):
     title =  country + " - " + units       
     
     return title, df, x, y
+
+def country_codes():
+    
+    # request data
+    country_codes = get_data('https://api.worldbank.org/v2/country/?format=json&page=1&per_page=2000')
+    
+    # store the values in a list for the df
+    country = []
+    codes = []
+ 
+    # store the country and country code
+    for code in country_codes[1]:
+        country.append(code['name'])
+        codes.append(code['id'])
+    
+    # create a dataframe based on json
+    df = pd.DataFrame({'country': country, 'code': codes})   
+    
+    return df
 
