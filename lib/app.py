@@ -1,4 +1,5 @@
 from lib import chart, menu, request
+from tabulate import tabulate
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
@@ -38,10 +39,10 @@ def interpreter(pair):
        
         # request the country codes
         country_codes = request.country_codes()
-        
-        print(country_codes.to_string(index=False))
-
-        return  
+       
+        print(tabulate(country_codes, headers='keys', tablefmt='psql', showindex=False))        
+    
+        return
    
     # available commands
     elif pair[0] == 'help':

@@ -25,8 +25,6 @@ def main():
     else:
         pairs = app.generate_pairs(sys.argv)
     
-    print(pairs) 
-
     # loop through command passed to the script
     for pair in pairs: 
         

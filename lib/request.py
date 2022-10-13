@@ -80,7 +80,7 @@ def country_codes():
         codes.append(code['id'])
     
     # create a dataframe based on json
-    df = pd.DataFrame({'country': country, 'code': codes})   
+    df = pd.DataFrame({'code': codes, 'country': country})   
     
     return df
 
