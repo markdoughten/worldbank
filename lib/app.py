@@ -1,5 +1,6 @@
 from lib import chart, menu, request
 from tabulate import tabulate
+from pprint import pprint
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
@@ -9,6 +10,22 @@ import requests
 import json
 import multiprocessing 
 import time
+
+
+def get_commands():
+    """Return the commands available with the indicators programmed"""
+    
+    # a list of all the commands currently available
+    commands = {
+        'codes': {'description': 'return the country to country code mapping'}, 
+        'gdp': {'indicator': 'NY.GDP.MKTP.CD', 'syntax': '<country code> gdp', 'units': '$', 'description': 'return the target country\'s recorded gdp per year (USD)'}, 
+        'electricity': {'indicator': '1.1_ACCESS.ELECTRICITY.TOT','syntax': '<country code> electricity ', 'units': '%', 'description': 'return the target country\'s recorded electriciy access as percent of population'}, 
+        'population': {'indicator': 'SP.POP.TOTL','syntax': '<country code> population', 'description': 'return the target country\'s recorded population'}, 
+        'land': {'indicator': 'SP.POP.TOTL','syntax': '<country code> land', 'units': '%', 'description': 'return the target country\'s % land dedicated to agriculture'}, 
+        'exit': {'description': 'exit the program'}
+        }
+
+    return commands
 
 def generate_pairs(command):
     """Returns the pairs passed through the command line"""
@@ -24,16 +41,20 @@ def generate_pairs(command):
 
 def validation(pair):
     """Validate a country code is used before sending off to API"""    
- 
-    try:
-        pair[1]
-    except IndexError:
-        print(f"please use the following syntax: {pair[0]} <country_code>\nlist of country codes : codes" )
-        return False
+    
+    commands = get_commands()    
 
+    if pair[0] in commands:
+        print('try: ' + {commands[pair[0]]['syntax']})
+        return False
+    else:
+        return True
+    
 def interpreter(pair):
     """Interprets each line passed from the user and routes to next steps for the application"""
-    
+
+    commands = get_commands()
+   
     # load the country code mapping
     if pair[0] == 'codes':
        
@@ -48,9 +69,9 @@ def interpreter(pair):
     elif pair[0] == 'help':
        
         try: 
-            print(menu.user_help(pair[1]))
+            pprint(menu.user_help(pair[1]))
         except IndexError:
-            print(menu.user_help('all'))
+            pprint(menu.user_help('all'))
         
         return
     
@@ -58,46 +79,20 @@ def interpreter(pair):
     elif validation(pair) == False:
         return 
     
-    # execute the gdp command
-    elif pair[1] == 'gdp':
-         
-        # gross domestic product
-        indicator = 'NY.GDP.MKTP.CD'
+    # search the commands for the indicator
+    elif pair[1] in commands:
         
+        # get the list
+        indicator = commands[pair[1]]['indicator']
+        
+        # handle no indicator    
+        try:
+            units = commands[pair[1]]['units']
+        except KeyError:
+            units = ''
+            
         # generate the chart
-        chart.create_chart(pair[0], indicator, '$')
-
-        return
-
-    elif pair[1] == 'electricity':
-        
-        # the percentage of population with electricity                                
-        indicator = '1.1_ACCESS.ELECTRICITY.TOT'
-        
-        # create a chart based on the data            
-        chart.create_chart(pair[0], indicator, '%')
-
-        return
-        
-    elif pair[1] == 'population':
-        
-        # total population
-        indicator = 'SP.POP.TOTL'
-        
-        # create the chart            
-        chart.create_chart(pair[0], indicator, '')
-
-        return
- 
-    elif pair[1] == 'land':
-        
-        # land percentage
-        indicator = 'AG.LND.AGRI.ZS'
-        
-        # create the chart            
-        chart.create_chart(pair[0], indicator, '%')
-
-        return
+        chart.create_chart(pair[0], indicator, units)
 
     else:
        # provide the help command
