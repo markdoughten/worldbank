@@ -40,7 +40,7 @@ def interpreter(pair):
         # request the country codes
         country_codes = request.country_codes()
        
-        print(tabulate(country_codes, headers='keys', tablefmt='psql', showindex=False))        
+        print(tabulate(country_codes, headers='keys', showindex=False))        
     
         return
    
@@ -86,6 +86,16 @@ def interpreter(pair):
         
         # create the chart            
         chart.create_chart(pair[0], indicator, '')
+
+        return
+ 
+    elif pair[1] == 'land':
+        
+        # land percentage
+        indicator = 'AG.LND.AGRI.ZS'
+        
+        # create the chart            
+        chart.create_chart(pair[0], indicator, '%')
 
         return
 
