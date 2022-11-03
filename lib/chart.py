@@ -30,7 +30,7 @@ def chart(title, x, y, units):
     # plot
     ax.plot(x, y)
     ax.set_xticks(np.arange(min(x), max(x), 10))
-
+    
     # units
     if units == '$':
         ax.yaxis.set_major_formatter(currency)
