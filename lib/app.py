@@ -21,7 +21,7 @@ def get_commands():
         'gdp': {'indicator': 'NY.GDP.MKTP.CD', 'syntax': '<country code> gdp', 'units': '$', 'description': 'return the target country\'s recorded gdp per year (USD)'}, 
         'electricity': {'indicator': '1.1_ACCESS.ELECTRICITY.TOT','syntax': '<country code> electricity ', 'units': '%', 'description': 'return the target country\'s recorded electriciy access as percent of population'}, 
         'population': {'indicator': 'SP.POP.TOTL','syntax': '<country code> population', 'description': 'return the target country\'s recorded population'}, 
-        'land': {'indicator': 'SP.POP.TOTL','syntax': '<country code> land', 'units': '%', 'description': 'return the target country\'s % land dedicated to agriculture'}, 
+        'land': {'indicator': 'AG.LND.AGRI.ZS','syntax': '<country code> land', 'units': '%', 'description': 'return the target country\'s % land dedicated to agriculture'}, 
         'exit': {'description': 'exit the program'}
         }
 
@@ -30,26 +30,37 @@ def get_commands():
 def generate_pairs(command):
     """Returns the pairs passed through the command line"""
     
-    country_code = command.pop(0)
     pairs = []
+   
+    country_codes, indicators = seperate(command)
     
-    for code in command:
-        pairs.append([country_code, code])
+    # creates pairs for the interpreter and combines help with first command after 
+    if country_codes:
+        for country_code in country_codes: 
+            for indicator in indicators:
+                pairs.append([country_code, indicator])
+    else:
+        if indicators:
+            pairs.append([indicators[0], indicators[1]])
 
     return pairs
 
+def seperate(command):
+    """Seperates the original system args into the codes and the indicators"""
 
-def validation(pair):
-    """Validate a country code is used before sending off to API"""    
+    commands = get_commands()
+    country_codes = []
     
-    commands = get_commands()    
-
-    if pair[0] in commands:
-        print('try: ' + {commands[pair[0]]['syntax']})
-        return False
-    else:
-        return True
+    # search the command and store the country codes in a list and send the rest of the command back
+    while len(command) > 0:
+        if command[0] in commands.keys():
+            break
+        else: 
+            country_codes.append(command[0])
+            command.pop(0)
     
+    return country_codes, command
+ 
 def interpreter(pair):
     """Interprets each line passed from the user and routes to next steps for the application"""
 
@@ -74,10 +85,6 @@ def interpreter(pair):
             pprint(menu.user_help('all'))
         
         return
-    
-    # validate the line has a country code
-    elif validation(pair) == False:
-        return 
     
     # search the commands for the indicator
     elif pair[1] in commands:
