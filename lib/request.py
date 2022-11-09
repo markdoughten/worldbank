@@ -60,10 +60,7 @@ def country_data(country_code, indicator):
     # create a dataframe based on json
     df = pd.DataFrame({'date': x, 'value': y})   
     
-    # generate the title
-    title =  country + " - " + units       
-    
-    return title, df, x, y
+    return country, units, df, x, y
 
 def country_codes():
     

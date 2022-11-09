@@ -17,7 +17,7 @@ def main():
     # record the created processes       
     processes = []
     
-    if sys.argv:
+    if len(sys.argv) > 2:
         
         # remove the file name
         sys.argv.pop(0)    

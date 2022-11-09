@@ -27,6 +27,32 @@ def get_commands():
 
     return commands
 
+def get_indicator(command):
+
+    # load the commands
+    commands = get_commands()
+    
+     # handle no command    
+    try:
+        indicator = commands[command]['indicator']
+    except KeyError:
+        indicator = ''
+
+    return indicator 
+
+def get_units(indicator):
+   
+    # load the commands 
+    commands = get_commands()
+
+    # handle no indicator    
+    try:
+        units = commands[indicator]['units']
+    except KeyError:
+        units = ''
+
+    return units 
+
 def generate_pairs(command):
     """Returns the pairs passed through the command line"""
     
@@ -36,9 +62,8 @@ def generate_pairs(command):
     
     # creates pairs for the interpreter and combines help with first command after 
     if country_codes:
-        for country_code in country_codes: 
-            for indicator in indicators:
-                pairs.append([country_code, indicator])
+        for country_code in country_codes:
+            pairs.append([country_code, indicators])
     else:
         if indicators:
             pairs.append([indicators[0], indicators[1]])
@@ -87,19 +112,10 @@ def interpreter(pair):
         return
     
     # search the commands for the indicator
-    elif pair[1] in commands:
+    elif pair[1]:
         
-        # get the list
-        indicator = commands[pair[1]]['indicator']
-        
-        # handle no indicator    
-        try:
-            units = commands[pair[1]]['units']
-        except KeyError:
-            units = ''
-            
         # generate the chart
-        chart.create_chart(pair[0], indicator, units)
+        chart.create_chart(pair[0], pair[1])
 
     else:
        # provide the help command

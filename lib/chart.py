@@ -11,26 +11,44 @@ import json
 import multiprocessing 
 import time
 
-def create_chart(country_code, indicator, units):
-
-    # create a dataframe based on json request
-    title, df, x, y = request.country_data(country_code, indicator)
-               
-    # call the chart function to build the chart
-    chart(title, x, y, units) 
+def create_chart(country_code, commands):
     
+    fig, axs = plt.subplots(1, len(commands), figsize=(15, 5))
+    i = 0
+
+    for command in commands:
+        
+        # create a dataframe based on json request
+        country, title, df, x, y = request.country_data(country_code, app.get_indicator(command))
+        
+        # call the chart function to build the chart
+        axs[i] = chart(title, x, y, axs[i])
+    
+        # set the title
+        axs[i].set_title(title)
+
+        # format the y-axis
+        axs[i] = set_units(axs[i], app.get_units(command)) 
+        
+        # count the subplots        
+        i += 1
+    
+    fig.suptitle(country)
+    plt.show()
+     
     return
 
-def chart(title, x, y, units):
+def chart(title, x, y, ax):
     """Create a basic chart using x and y columns"""
 
-    # instantiating a class     
-    fig, ax = plt.subplots()
-    
     # plot
     ax.plot(x, y)
-    ax.set_xticks(np.arange(min(x), max(x), 10))
-    
+    ax.set_xticks(np.arange(min(x), max(x), int((max(x)-min(x))/5)))
+
+    return ax
+
+def set_units(ax, units):
+ 
     # units
     if units == '$':
         ax.yaxis.set_major_formatter(currency)
@@ -38,12 +56,8 @@ def chart(title, x, y, units):
         ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=100))
     else:
         ax.yaxis.set_major_formatter(standard)
-
-    # plot attributes
-    plt.title(title)
-    plt.show()
-
-    return
+ 
+    return ax
 
 def currency(x, pos):
     """Format the currency values for the chart"""
