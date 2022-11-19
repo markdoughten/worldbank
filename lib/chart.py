@@ -10,39 +10,70 @@ import requests
 import json
 import multiprocessing 
 import time
+import math
 
-def create_chart(country_code, commands):
+def subplots(commands):
+
+    height = math.ceil(len(commands)/3)
     
-    fig, axs = plt.subplots(1, len(commands), figsize=(15, 5))
-    i = 0
+    if len(commands) < 3:
+        width = len(commands)
+    else:
+        width = 3
 
-    for command in commands:
-        
-        # create a dataframe based on json request
-        country, title, df, x, y = request.country_data(country_code, app.get_indicator(command))
-        
-        # call the chart function to build the chart
-        axs[i] = chart(title, x, y, axs[i])
+    fig, axs = plt.subplots(height, width, figsize=(15, 5))
+
+    return fig, axs, height
+
+def chart(country_codes, commands):
+   
+    fig, axs, height = subplots(commands)
     
-        # set the title
-        axs[i].set_title(title)
-
-        # format the y-axis
-        axs[i] = set_units(axs[i], app.get_units(command)) 
+    y_pos = height - 1
         
+    while y_pos >= 0: 
+
+        x_pos = len(commands) % 3
+        
+        if x_pos == 0:
+            x_pos = 2
+            
+        while x_pos >= 0:
+
+            command = commands.pop(0)
+            
+            # plot each country
+            for country_code in country_codes:
+            
+                # create a dataframe based on json request
+                country, title, df, x, y = request.country_data(country_code, app.get_indicator(command))
+                
+                ax = axs[y_pos, x_pos]
+         
+                # call the chart function to build the plot
+                ax = plot(country, x, y, ax)
+                
+                # set the title
+                ax.set_title(title)
+
+                # format the y-axis
+                ax = set_units(ax, app.get_units(command))
+            
+            x_pos -= 1
+            
         # count the subplots        
-        i += 1
+        y_pos -= 1
     
-    fig.suptitle(country)
+    plt.legend() 
     plt.show()
      
     return
 
-def chart(title, x, y, ax):
+def plot(country, x, y, ax):
     """Create a basic chart using x and y columns"""
 
     # plot
-    ax.plot(x, y)
+    ax.plot(x, y, label=country)
     ax.set_xticks(np.arange(min(x), max(x), int((max(x)-min(x))/5)))
 
     return ax

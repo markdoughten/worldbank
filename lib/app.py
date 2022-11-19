@@ -53,23 +53,6 @@ def get_units(indicator):
 
     return units 
 
-def generate_pairs(command):
-    """Returns the pairs passed through the command line"""
-    
-    pairs = []
-   
-    country_codes, indicators = seperate(command)
-    
-    # creates pairs for the interpreter and combines help with first command after 
-    if country_codes:
-        for country_code in country_codes:
-            pairs.append([country_code, indicators])
-    else:
-        if indicators:
-            pairs.append([indicators[0], indicators[1]])
-
-    return pairs
-
 def seperate(command):
     """Seperates the original system args into the codes and the indicators"""
 
@@ -84,7 +67,7 @@ def seperate(command):
             country_codes.append(command[0])
             command.pop(0)
     
-    return country_codes, command
+    return [country_codes, command]
  
 def interpreter(pair):
     """Interprets each line passed from the user and routes to next steps for the application"""
@@ -114,8 +97,8 @@ def interpreter(pair):
     # search the commands for the indicator
     elif pair[1]:
         
-        # generate the chart
-        chart.create_chart(pair[0], pair[1])
+        # generate the chart with country codes and commands
+        chart.chart(pair[0], pair[1])
 
     else:
        # provide the help command

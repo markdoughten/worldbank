@@ -25,21 +25,11 @@ def main():
         if len(sys.argv) == 1:
             pairs = [sys.argv]
         else:
-            pairs = app.generate_pairs(sys.argv)
+            pairs = app.seperate(sys.argv)
 
-        # loop through command passed to the script
-        for pair in pairs: 
-            
-            # timer
-            start = time.time()
-            
-            # create a process and submit the line to the interpreter
-            p = multiprocessing.Process(target=app.interpreter, args=(pair,))
-            processes.append(p)
-            p.start()
-            
-            # hang main so chart can get produced 
-            time.sleep(time.time()-start)
+        # create a process and submit the line to the interpreter
+        app.interpreter(pairs)
+        
     else:
         print('syntax: python main.py <country_code> <indicator>')
         exit()
