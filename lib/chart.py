@@ -4,6 +4,7 @@ from lib import app, chart, menu, request
 # builtin libraries
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
+import matplotlib.gridspec as gridspec
 import numpy as np 
 import pandas as pd
 import requests
@@ -14,20 +15,17 @@ import math
 
 def subplots(commands):
 
+    fig = plt.figure(figsize=(15, 5))
+
     height = math.ceil(len(commands)/3)
-    
-    if len(commands) < 3:
-        width = len(commands)
-    else:
-        width = 3
-
-    fig, axs = plt.subplots(height, width, figsize=(15, 5))
-
-    return fig, axs, height
+   
+    spec = gridspec.GridSpec(height, 3, figure=fig)
+ 
+    return fig, height, spec
 
 def chart(country_codes, commands):
    
-    fig, axs, height = subplots(commands)
+    fig, height, spec = subplots(commands)
     
     y_pos = height - 1
         
@@ -37,10 +35,14 @@ def chart(country_codes, commands):
         
         if x_pos == 0:
             x_pos = 2
+        else:
+            x_pos -= 1
             
         while x_pos >= 0:
 
             command = commands.pop(0)
+            
+            ax = fig.add_subplot(spec[y_pos, x_pos]) 
             
             # plot each country
             for country_code in country_codes:
@@ -48,8 +50,6 @@ def chart(country_codes, commands):
                 # create a dataframe based on json request
                 country, title, df, x, y = request.country_data(country_code, app.get_indicator(command))
                 
-                ax = axs[y_pos, x_pos]
-         
                 # call the chart function to build the plot
                 ax = plot(country, x, y, ax)
                 
@@ -58,7 +58,7 @@ def chart(country_codes, commands):
 
                 # format the y-axis
                 ax = set_units(ax, app.get_units(command))
-            
+    
             x_pos -= 1
             
         # count the subplots        
