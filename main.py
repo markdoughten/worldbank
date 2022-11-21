@@ -23,10 +23,10 @@ def main():
         sys.argv.pop(0)    
         
         if len(sys.argv) == 1:
-            pairs = [sys.argv]
+            pairs = sys.argv
         else:
             pairs = app.seperate(sys.argv)
-
+        
         # create a process and submit the line to the interpreter
         app.interpreter(pairs)
         

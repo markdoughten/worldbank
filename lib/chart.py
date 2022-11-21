@@ -15,7 +15,7 @@ import math
 
 def subplots(commands):
 
-    fig = plt.figure(figsize=(15, 5))
+    fig = plt.figure(figsize=(10, 10))
 
     height = math.ceil(len(commands)/3)
    
