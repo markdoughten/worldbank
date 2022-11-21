@@ -14,12 +14,20 @@ import time
 import math
 
 def subplots(commands):
-
-    fig = plt.figure(figsize=(10, 10))
-
+    
+    # set the parameters
     height = math.ceil(len(commands)/3)
+    width = len(commands)
    
-    spec = gridspec.GridSpec(height, 3, figure=fig)
+    # adjust the width for small subplots 
+    if width < 3: 
+        fig = plt.figure(figsize=(width*5, height*4))
+    else:
+        fig = plt.figure(figsize=(15, height*4))
+        width = 3
+    
+    # create the grid layout based on the command inputs 
+    spec = gridspec.GridSpec(height, width, figure=fig)
  
     return fig, height, spec
 
@@ -31,8 +39,10 @@ def chart(country_codes, commands):
         
     while y_pos >= 0: 
 
+        # the starting x_pos is the remainder after filled rows
         x_pos = len(commands) % 3
-        
+       
+        # reset the x_pos once it hits 0 
         if x_pos == 0:
             x_pos = 2
         else:
