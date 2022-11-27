@@ -18,6 +18,7 @@ def get_commands():
     # a list of all the commands currently available
     commands = {
         'codes': {'description': 'return the country to country code mapping'}, 
+        'help': {'description': 'return the programmed commands'}, 
         'gdp': {'indicator': 'NY.GDP.MKTP.CD', 'syntax': '<country code> gdp', 'units': '$', 'description': 'return the target country\'s recorded gdp per year (USD)'}, 
         'electricity': {'indicator': '1.1_ACCESS.ELECTRICITY.TOT','syntax': '<country code> electricity ', 'units': '%', 'description': 'return the target country\'s recorded electriciy access as percent of population'}, 
         'population': {'indicator': 'SP.POP.TOTL','syntax': '<country code> population', 'description': 'return the target country\'s recorded population'}, 
@@ -73,22 +74,26 @@ def interpreter(pair):
     """Interprets each line passed from the user and routes to next steps for the application"""
 
     commands = get_commands()
-   
+  
     # load the country code mapping
-    if pair[0] == 'codes':
-       
-        # request the country codes
-        country_codes = request.country_codes()
-       
+    if pair[1][0] == 'codes':
+        
+        # see if a user enters a string to search the countries
+        if len(pair[1]) == 2:
+            # request the country codes
+            country_codes = request.country_codes(pair[1][1])
+        else:
+            country_codes = request.country_codes()
+        
         print(tabulate(country_codes, headers='keys', showindex=False))        
     
         return
    
     # available commands
-    elif pair[0] == 'help':
+    elif pair[1][0] == 'help':
        
         try: 
-            pprint(menu.user_help(pair[1]))
+            pprint(menu.user_help(pair[1][1]))
         except IndexError:
             pprint(menu.user_help('all'))
         

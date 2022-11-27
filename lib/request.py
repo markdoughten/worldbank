@@ -62,7 +62,7 @@ def country_data(country_code, indicator):
     
     return country, units, df, x, y
 
-def country_codes():
+def country_codes(character=None):
     
     # request data
     country_codes = get_data('https://api.worldbank.org/v2/country/?format=json&page=1&per_page=2000')
@@ -77,7 +77,11 @@ def country_codes():
         codes.append(code['id'])
     
     # create a dataframe based on json
-    df = pd.DataFrame({'code': codes, 'country': country})   
+    df = pd.DataFrame({'code': codes, 'country': country})
     
+    # filter the df based on the user's request
+    if character:
+        df = df[df['country'].str.lower().str.startswith(character)]
+           
     return df
 
