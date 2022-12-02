@@ -81,7 +81,7 @@ def country_codes(character=None):
     
     # filter the df based on the user's request
     if character:
-        df = df[df['country'].str.lower().str.startswith(character)]
+        df = df[df['country'].str.lower().str.startswith((character.lower()))]
            
     return df
 
