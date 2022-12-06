@@ -58,23 +58,28 @@ def chart(country_codes, commands):
             for country_code in country_codes:
             
                 # create a dataframe based on json request
-                country, title, df, x, y = request.country_data(country_code, app.get_indicator(command))
-                
-                # call the chart function to build the plot
-                ax = plot(country, x, y, ax)
-                
-                # set the title
-                ax.set_title(title)
+                data = request.country_data(country_code, app.get_indicator(command))
 
-                # format the y-axis
-                ax = set_units(ax, app.get_units(command))
+                if data: 
+                  
+                    # set variables 
+                    country, title, df = [data[i] for i in (0, 1, 2)]
+ 
+                    # call the chart function to build the plot
+                    ax = plot(country, df['date'].values.tolist(), df['value'].values.tolist(), ax)
+                    ax.set_title(title)
+
+                    # format the y-axis
+                    ax = set_units(ax, app.get_units(command))
+
+                    # show legend
+                    ax.legend() 
     
             x_pos -= 1
             
         # count the subplots        
         y_pos -= 1
     
-    plt.legend() 
     plt.show()
      
     return

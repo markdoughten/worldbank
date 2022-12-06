@@ -19,10 +19,13 @@ def get_url(country_code, indicator):
 
 def get_data(url):
     """Send GET request to the Word Bank API based on URL"""
-    
-    response = requests.get(url)
+     
+    response = requests.get(url).json()
 
-    return response.json()
+    if response[0]['total'] == 0:
+        return None 
+
+    return response
 
 def country_data(country_code, indicator):
     """Send GET request to the Word Bank API based on URL"""
@@ -37,30 +40,34 @@ def country_data(country_code, indicator):
     
     # request country data
     dataset = get_data(url)
-    
-    # store the data
-    for data in dataset[1]:
-
-        # store the x values
-        x.append(int(data['date']))
+   
+    if dataset: 
         
-        # store the y values
-        y.append(data['value'])
-    
-    # reverse the list data
-    x.reverse()
-    y.reverse()
+        # store the data
+        for data in dataset[1]:
 
-    # get the units
-    units = dataset[1][0]['indicator']['value']
+            # store the x values
+            x.append(int(data['date']))
+            
+            # store the y values
+            y.append(data['value'])
+        
+        # reverse the list data
+        x.reverse()
+        y.reverse()
 
-    # get the country
-    country = dataset[1][0]['country']['value']
-    
-    # create a dataframe based on json
-    df = pd.DataFrame({'date': x, 'value': y})   
-    
-    return country, units, df, x, y
+        # get the units
+        title = dataset[1][0]['indicator']['value']
+
+        # get the country
+        country = dataset[1][0]['country']['value']
+        
+        # create a dataframe based on json
+        df = pd.DataFrame({'date': x, 'value': y})   
+        
+        return [country, title, df]
+
+    return None
 
 def country_codes(character=None):
     
