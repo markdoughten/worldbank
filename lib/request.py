@@ -2,14 +2,10 @@
 from lib import app, chart, menu 
 
 # builtin libraries
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
 import numpy as np 
 import pandas as pd
 import requests
 import json
-import multiprocessing 
-import time
 
 def get_url(country_code, indicator):
     

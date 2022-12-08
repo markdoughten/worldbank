@@ -7,10 +7,6 @@ import matplotlib.ticker as mtick
 import matplotlib.gridspec as gridspec
 import numpy as np 
 import pandas as pd
-import requests
-import json
-import multiprocessing 
-import time
 import math
 
 def subplots(commands):
@@ -64,7 +60,7 @@ def chart(country_codes, commands):
                   
                     # set variables 
                     country, title, df = [data[i] for i in (0, 1, 2)]
- 
+                   
                     # call the chart function to build the plot
                     ax = plot(country, df['date'].values.tolist(), df['value'].values.tolist(), ax)
                     ax.set_title(title)
