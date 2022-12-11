@@ -1,4 +1,4 @@
-from lib import chart, menu, request
+from lib import chart, storage, request
 from tabulate import tabulate
 from pprint import pprint
 
@@ -24,7 +24,7 @@ def seperate(command):
 def interpreter(pair):
     """Interprets each line passed from the user and routes to next steps for the application"""
 
-    commands = get_commands()
+    commands = storage.get_commands()
   
     # load the country code mapping
     if pair[1][0] == 'codes':

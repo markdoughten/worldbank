@@ -1,5 +1,5 @@
 # customer libraries
-from lib import app, chart, menu, request 
+from lib import app, chart, storage, request 
 
 # builtin libraries
 import matplotlib.pyplot as plt
@@ -54,7 +54,7 @@ def chart(country_codes, commands):
             for country_code in country_codes:
             
                 # create a dataframe based on json request
-                data = request.country_data(country_code, app.get_indicator(command))
+                data = request.country_data(country_code, storage.get_indicator(command))
 
                 if data: 
                   
@@ -66,7 +66,7 @@ def chart(country_codes, commands):
                     ax.set_title(title)
 
                     # format the y-axis
-                    ax = set_units(ax, app.get_units(command))
+                    ax = set_units(ax, storage.get_units(command))
 
                     # show legend
                     ax.legend() 
