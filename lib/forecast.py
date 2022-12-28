@@ -4,10 +4,8 @@ import pandas as pd
 import requests
 import json
 import matplotlib.pyplot as plt
-from statsmodels.tsa.arima_model import ARIMA
-from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-from statsmodels.tsa.seasonal import seasonal_decompose
-from statsmodels.tsa.api import ExponentialSmoothing, SimpleExpSmoothing, Holt
+import statsmodels.api as sm
+import statsmodels.tsa.api as tsa
 
 def fill_missing(values):
 
@@ -21,26 +19,6 @@ def series(df, column_name):
 
     return series
  
-def forecast(df, column_name='value'):
-    
-    # takes a dataframe and splits into train and test
-    train, test = split(df)
-    df = year(df)
-    
-    model = ARIMA(train.values, order=(5, 0, 2))
-    model_fit = model.fit(disp=False)
-
-    predictions = model_fit.predict(len(test))
-    test_ = pandas.DataFrame(test)
-    test_['predictions'] = predictions[0:1871]
-
-    plt.plot(df[column_name])
-    plt.plot(test_.predictions)
-    plt.show()
-
-    # returns dataframe with forecasted values
-    return df
-
 def year(df, column_name='date'):
 
     df[column_name] = pd.to_datetime(df[column_name], format='%Y')
@@ -70,7 +48,7 @@ def pacf(series):
 
 def acf(series):
 
-    plot_acf(series)
+    sm.plot_acf(series)
     plt.show()
 
     return
@@ -78,55 +56,58 @@ def acf(series):
 def decomposition(series, model='multiplicative'):
     
     # show the decomposition
-    result = seasonal_decompose(series, model=model)
+    result = sm.seasonal_decompose(series, model=model)
     result.plot()
     plt.show()
     
     return
 
+def calculate_error(actual, forecast):
+
+    errors = {'Mean Bias': sm.tools.eval_measures.bias(actual, forecast), 
+    'IQR': sm.tools.eval_measures.iqr(actual, forecast),
+    'Maximum Absolute Error': sm.tools.eval_measures.maxabs(actual, forecast),
+    'Mean Absolute Error': sm.tools.eval_measures.meanabs(actual, forecast),
+    'Median Absolute Error': sm.tools.eval_measures.medianabs(actual, forecast),       
+    'Median Bias': sm.tools.eval_measures.medianbias(actual, forecast),       
+    'Mean Squared Error': sm.tools.eval_measures.mse(actual, forecast),      
+    'Root Mean Squared Error': sm.tools.eval_measures.rmse(actual, forecast),  
+    'Root Mean Squared Percentage Error': sm.tools.eval_measures.rmspe(actual, forecast),       
+    'Standard Deviation of Error': sm.tools.eval_measures.stde(actual, forecast),       
+    'Variance of Error': sm.tools.eval_measures.vare(actual, forecast)       
+    }
+    
+    print('Summary of errors resulting from actuals & forecast:')
+    print(errors)    
+    
+    return errors 
+
+def arima(series, horizon):
+    
+    fit = tsa.ARIMA(series, order=(5, 0, 2)).fit()
+    forecast = fit.forecast(horizon)
+    
+    return fit, forecast
+
 def simple_expontential_smoothing(series, horizon):
 
-    fit = SimpleExpSmoothing(series, initialization_method="estimated").fit()
-
+    fit = tsa.SimpleExpSmoothing(series, initialization_method="estimated").fit()
     forecast = fit.forecast(horizon).rename(r"$\alpha=%s$" % fit.model.params["smoothing_level"])
    
     return fit, forecast
 
-def error(actual, forecast):
-    
-    # compare test forecast to actuals
-    error = actual - forecast
-    
-    ME = sum(error)*1.0/len(actual)
-    MAE = sum(abs(error))*1.0/len(actual)
-    MSE = sum(error**2)*1.0/len(actual)
-   
-    PE = (error/actual)*100    
-    MPE = sum(error)/len(forecast)
-    MAE = sum(abs(error))/len(forecast)
-
-    print('Summary of errors resulting from actuals & forecast:')
-    
-    results = {'Errors': ['ME', 'MAE', 'MSE', 'MPE', 'MAPE'], 'Value': [ME, MAE, PE, MPE, MAE]}
-
-    output = pd.DataFrame(results, columns=['Errors', 'Value'])
-
-    print(output)       
-    
-    return output
-
 def holt_method(df, horizon, exponential=False, damped_trend=False):
     
     if exponential:
-        fit = Holt(df, exponential=True, initialization_method="estimated").fit(smoothing_level=0.8, smoothing_trend=0.2, optimized=False)
+        fit = tsa.Holt(df, exponential=True, initialization_method="estimated").fit(smoothing_level=0.8, smoothing_trend=0.2, optimized=False)
         forecast = fit.forecast(horizon).rename("Exponential trend")
 
     elif damped_trend:
-        fit = Holt(df, damped_trend=True, initialization_method="estimated").fit(smoothing_level=0.8, smoothing_trend=0.2)
+        fit = tsa.Holt(df, damped_trend=True, initialization_method="estimated").fit(smoothing_level=0.8, smoothing_trend=0.2)
         forecast = fit.forecast(horizon).rename("Additive damped trend")
 
     else:
-        fit = Holt(df, initialization_method="estimated").fit(smoothing_level=0.8, smoothing_trend=0.2, optimized=False)
+        fit = tsa.Holt(df, initialization_method="estimated").fit(smoothing_level=0.8, smoothing_trend=0.2, optimized=False)
         forecast = fit.forecast(horizon).rename("Holt's linear trend")
 
     return fit, forecast
@@ -154,18 +135,23 @@ plt.plot(train, color='black')
 plt.plot(test, color='red')
 
 fit, simple = simple_expontential_smoothing(train, horizon=len(test))
-(line1,) = plt.plot(simple, color='purple')
+(line1,) = plt.plot(simple)
 
 fit, holt = holt_method(train, len(test))
-(line2,) = plt.plot(holt, color='orange')
+(line2,) = plt.plot(holt)
 
 fit, holt_exponential = holt_method(train, len(test), exponential=True)
-(line3,) = plt.plot(holt_exponential, color='blue')
+(line3,) = plt.plot(holt_exponential)
+
+error(test, holt_exponential)
 
 fit, hold_damped = holt_method(train, len(test), damped_trend=True)
-(line4,) = plt.plot(hold_damped, color='green')
+(line4,) = plt.plot(hold_damped)
 
-plt.legend([line1, line2, line3, line4], [simple.name, holt.name, holt_exponential.name, hold_damped.name])
+fit, arima_output = arima(train, len(test))
+(line5,) = plt.plot(arima_output)
+
+plt.legend([line1, line2, line3, line4, line5], [simple.name, holt.name, holt_exponential.name, hold_damped.name, arima_output.name])
 plt.show()
 
-error(test, simple)
+error(test, arima_output)
