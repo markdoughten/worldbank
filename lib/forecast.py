@@ -6,10 +6,7 @@ import json
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import statsmodels.tsa.api as tsa
-
-def fill_missing(values):
-
-    return
+import warnings
 
 def convert_series(df, column_name):
     
@@ -19,18 +16,6 @@ def convert_series(df, column_name):
 
     return series
  
-def year(df, column_name='date'):
-
-    df[column_name] = pd.to_datetime(df[column_name], format='%Y')
-
-    return df
-
-def read(path):
-    
-    df = pd.read_csv(path)
-
-    return df
-
 def split(df, column_name='value'):
 
     # 8:2 ratio on the split
@@ -38,29 +23,6 @@ def split(df, column_name='value'):
     train, test = df[column_name][0:split], df[column_name][split:]
     
     return train, test
-
-def pacf(series):
-
-    plot_pacf(series)
-    plt.show()
-
-    return
-
-def acf(series):
-
-    sm.plot_acf(series)
-    plt.show()
-
-    return
-
-def decomposition(series, model='multiplicative'):
-    
-    # show the decomposition
-    result = sm.seasonal_decompose(series, model=model)
-    result.plot()
-    plt.show()
-    
-    return
 
 def calculate_error(actual, forecast):
 
@@ -79,37 +41,23 @@ def calculate_error(actual, forecast):
     
     return errors 
 
-def arima(series, horizon):
+def arima_method(series, horizon):
     
     fit = tsa.ARIMA(series, order=(5, 0, 2)).fit()
     forecast = fit.forecast(horizon)
     
     return fit, forecast
 
-def sarimax(series, horizon):
+def sarimax_method(series, horizon):
     
-    fit = tsa.SARIMAX(series, order=(5, 0, 2)).fit()
+    fit = tsa.SARIMAX(series, order=(5, 0, 2)).fit(disp=False)
     forecast = fit.forecast(horizon)
     
     return fit, forecast
 
-def auto_reg(series, horizon):
-    
-    fit = tsa.AutoReg(series, order=(5, 0, 2)).fit()
-    forecast = fit.forecast(horizon)
-    
-    return fit, forecast
-
-def ardl(series, horizon):
+def ardl_method(series, horizon):
     
     fit = tsa.ARDL(series, lags=horizon).fit()
-    forecast = fit.forecast(horizon)
-    
-    return fit, forecast
-
-def uecm(series, horizon):
-
-    fit = tsa.UECM(series, lags=horizon).fit()
     forecast = fit.forecast(horizon)
     
     return fit, forecast
@@ -137,54 +85,52 @@ def holt_method(df, horizon, exponential=False, damped_trend=False):
 
     return fit, forecast
 
-def naive():
+def search(test, forecasts):
+   
+    # set error to none 
+    error = None
     
-    # generate a basic naive forecast
-
-    return     
-
-def forecast():
+    # search the forecasts for the best rmse when compared to test
+    for forecast in forecasts:
+        if error is None:
+            # set error
+            error = calculate_error(test, forecast)['Root Mean Squared Percentage Error']
+            winner = forecast
+        else:
+            # save forecast with the lowest error
+            if error > calculate_error(test, forecast)['Root Mean Squared Percentage Error']:
+                error = calculate_error(test, forecast)['Root Mean Squared Percentage Error']
+                winner = forecast
     
-    # read the df from app
-    df = read('../docs/out.csv')
+    return winner
 
+def methods(train, horizon):
+    
+    # forecasting methods
+    fit, simple = simple_expontential_smoothing(train, horizon)
+    fit, holt = holt_method(train, horizon)
+    fit, holt_exponential = holt_method(train, horizon, exponential=True)
+    fit, holt_damped = holt_method(train, horizon, damped_trend=True)
+    fit, arima = arima_method(train, horizon)
+    fit, sarima = sarimax_method(train, horizon)
+    fit, ardl = ardl_method(train, horizon)
+    
+    return [simple, holt, holt_exponential, holt_damped, arima, sarima, ardl]   
+
+def forecast(df):
+   
+    # ignore warnings
+    warnings.filterwarnings("ignore")
+ 
     # convert a df to a series
     series = convert_series(df, 'date')
 
-    #acf(series)
-    #pacf(series)
-    #decomposition(series)
-
     train, test = split(df)
 
-    plt.plot(train, color='black')
-    plt.plot(test, color='red')
+    forecasts = methods(train, len(test))     
+    
+    winner = search(test, forecasts)
 
-    fit, simple = simple_expontential_smoothing(train, horizon=len(test))
-    (line1,) = plt.plot(simple)
-
-    fit, holt = holt_method(train, len(test))
-    (line2,) = plt.plot(holt)
-
-    fit, holt_exponential = holt_method(train, len(test), exponential=True)
-    (line3,) = plt.plot(holt_exponential)
-
-    fit, hold_damped = holt_method(train, len(test), damped_trend=True)
-    (line4,) = plt.plot(hold_damped)
-
-    fit, arima_output = arima(train, len(test))
-    (line5,) = plt.plot(arima_output)
-
-    fit, sarima_output = sarimax(train, len(test))
-    (line6,) = plt.plot(sarima_output)
-
-    fit, ardl_output = ardl(train, len(test))
-    (line7,) = plt.plot(ardl_output)
-
-    plt.legend([line1, line2, line3, line4, line5, line6, line7], 
-                [simple.name, holt.name, holt_exponential.name, hold_damped.name, arima_output.name, sarima_output.name, ardl_output.name])
-    plt.show()
-
-    calculate_error(test, arima_output)
-
-forecast()
+    df = winner.forecast(df, 5)
+    
+    return df
