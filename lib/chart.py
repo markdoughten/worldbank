@@ -48,7 +48,7 @@ def add_axis(fig, spec, y_pos, x_pos):
 
     return ax
 
-def plot(ax)
+def plot(ax):
 
     ax = plot(country, df['date'].values.tolist(), df['value'].values.tolist(), ax)
     

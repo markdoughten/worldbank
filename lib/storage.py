@@ -58,9 +58,9 @@ def user_help(request='all'):
     
     commands = get_commands()
         
-    if request == 'all':
-        return commands
-    else:
-        # the specific description and syntax
-        return commands[request]
+    if request != 'all':
+        commands = commands[request]
+
+    return commands
+
 

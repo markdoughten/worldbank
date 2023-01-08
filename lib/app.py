@@ -22,7 +22,7 @@ def seperate(command):
     return country_codes, command
 
 def codes(country_codes):
-
+    
     # see if a user enters a string to search the countries
     if len(country_codes) == 2:
         
@@ -32,14 +32,16 @@ def codes(country_codes):
     else:
         country_codes = request.country_codes()       
 
-    return tabulate(country_codes, headers='keys', showindex=False
+    return tabulate(country_codes, headers='keys', showindex=False)
 
 def user_help(commands):
 
      try: 
-        return pprint(storage.user_help(commands[1]))
+        output = storage.user_help(commands[1])
      except IndexError:
-        return pprint(storage.user_help('all'))
+        output = storage.user_help('all')
+
+     return tabulate(pd.DataFrame.from_dict(output, 'index'))
 
 def reset(pos):
 
@@ -102,7 +104,6 @@ def build(country_codes, commands):
 
     return 'success'
 
-
 def interpreter(country_codes, commands):
     """Interprets each line passed from the user and routes to next steps for the application"""
 
@@ -122,12 +123,11 @@ def interpreter(country_codes, commands):
     else:
         return 'try : help <command> or : help'
 
-
-def app(sys.argv):
-
+def app(sys):
+       
     # seperate into country codes and commands 
     country_codes, commands = seperate(sys.argv)
-       
+    
     # create a process and submit the line to the interpreter
     return interpreter(country_codes, commands)
     

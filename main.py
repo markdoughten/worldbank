@@ -20,17 +20,14 @@ def main():
     if len(sys.argv) >= 2:
         
         # remove the file name
-        sys.argv.pop(0)    
-       
-        # seperate into country codes and commands 
-        pairs = app.seperate(sys.argv)
-       
-        # create a process and submit the line to the interpreter
-        app.interpreter(pairs)
+        sys.argv.pop(0)
+      
+        # send command to app
+        return print(app.app(sys))
         
     else:
-        print('syntax: python main.py <country_code> <indicator>')
-        exit()
+        
+        return print('syntax: python main.py <country_code> <indicator>')
  
 if __name__ == '__main__':
     main()
