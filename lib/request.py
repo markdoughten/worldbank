@@ -53,15 +53,15 @@ def country_data(country_code, indicator):
         y.reverse()
 
         # get the units
-        title = dataset[1][0]['indicator']['value']
+        units = dataset[1][0]['indicator']['value']
 
         # get the country
-        country = dataset[1][0]['country']['value']
+        country_name = dataset[1][0]['country']['value']
         
         # create a dataframe based on json
         df = pd.DataFrame({'date': x, 'value': y})   
         
-        return [country, title, df]
+        return country_name, units, df
 
     return None
 
