@@ -36,12 +36,12 @@ def codes(command):
 
 def user_help(commands):
 
-     try: 
-        output = storage.user_help(commands[1])
-     except IndexError:
-        output = storage.user_help('all')
+    try: 
+       output = storage.user_help(commands[1])
+    except IndexError:
+       output = storage.user_help('all')
 
-     return tabulate(pd.DataFrame.from_dict(output, 'index'))
+    return output
 
 def reset(pos):
 
