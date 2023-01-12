@@ -16,13 +16,13 @@ def get_commands():
     
     # a list of all the commands currently available
     commands = {
-        'codes': {'description': 'country codes'}, 
-        'help': {'description': 'programmed commands'}, 
-        'gdp': {'indicator': 'NY.GDP.MKTP.CD', 'syntax': '<country code> gdp', 'units': '$', 'description': 'a country\'s recorded gdp per year (USD)'}, 
-        'electricity': {'indicator': '1.1_ACCESS.ELECTRICITY.TOT','syntax': '<country code> electricity ', 'units': '%', 'description': 'a country\'s recorded electriciy access as percent of population'}, 
-        'population': {'indicator': 'SP.POP.TOTL','syntax': '<country code> population', 'description': 'a country\'s recorded population'}, 
-        'land': {'indicator': 'AG.LND.AGRI.ZS','syntax': '<country code> land', 'units': '%', 'description': 'a country\'s % land dedicated to agriculture'}, 
-        'exit': {'description': 'exit the program'}
+        'codes': {'description': 'country codes', 'syntax': 'codes <letter>'}, 
+        'help': {'description': 'programmed commands', 'syntax':'help <command>'}, 
+        'gdp': {'indicator': 'NY.GDP.MKTP.CD', 'syntax': '<country code> gdp', 'units': '$', 'description': 'gross domestic product'}, 
+        'electricity': {'indicator': '1.1_ACCESS.ELECTRICITY.TOT','syntax': '<country code> electricity ', 'units': '%', 'description': 'electriciy access'}, 
+        'population': {'indicator': 'SP.POP.TOTL','syntax': '<country code> population', 'description': 'population size'}, 
+        'land': {'indicator': 'AG.LND.AGRI.ZS','syntax': '<country code> land', 'units': '%', 'description': 'land for agriculture'}, 
+        'exit': {'description': 'exit the program', 'syntax': 'exit'}
         }
     
     return commands
@@ -53,22 +53,19 @@ def get_units(indicator):
 
     return units 
 
-def menu(commands, sort_by='indicator'):
-
-    df = pd.DataFrame.from_dict(commands, 'index').fillna("")
-    df.index.name = 'commands'
-    df.sort_values(sort_by, ascending=False, inplace=True)
-    
-    return df.to_markdown()
-
-def user_help(request='all'):
+def user_help(request='all', sort_by='syntax'):
     """Return the commands to the user"""
     
-    commands = get_commands()
-        
-    if request != 'all':
-        commands = commands[request]
-
-    return menu(commands)
+    df = pd.DataFrame.from_dict(get_commands(), 'index').fillna("")
+    df.index.name = 'command'
+    df.drop('indicator', axis=1, inplace=True)
+    
+    if request == 'all':
+        df.sort_values(sort_by, inplace=True)
+    else:
+        if request in df.index:
+            df = df.filter(like=request, axis=0)
+    
+    return df.to_markdown()
 
 
