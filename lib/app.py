@@ -18,16 +18,16 @@ def seperate(command):
         else: 
             country_codes.append(command[0])
             command.pop(0)
-    
+
     return country_codes, command
 
-def codes(country_codes):
+def codes(command):
     
     # see if a user enters a string to search the countries
-    if len(country_codes) == 2:
+    if len(command) == 2:
         
         # request the country codes with search
-        country_codes = request.country_codes(country_codes[1])
+        country_codes = request.country_codes(command[1])
     
     else:
         country_codes = request.country_codes()       
@@ -109,7 +109,7 @@ def interpreter(country_codes, commands):
 
     # load the country code mapping
     if commands[0] == 'codes':
-        return codes(country_codes)
+        return codes(commands)
    
     # available commands
     elif commands[0] == 'help':
