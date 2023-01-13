@@ -10,14 +10,14 @@ def seperate(command):
 
     commands = storage.get_commands()
     country_codes = []
+    i = 0 
     
-    # search the command and store the country codes in a list and send the rest of the command back
-    while len(command) > 0:
-        if command[0] in commands.keys():
-            break
-        else: 
-            country_codes.append(command[0])
-            command.pop(0)
+    # store the commands and country codes in a list and send the rest of the command back
+    while i < len(command):
+        if command[i] not in commands.keys():
+            country_codes.append(command[i])
+            command.pop(i)
+        i += 1    
 
     return country_codes, command
 
@@ -57,7 +57,7 @@ def build(country_codes, commands):
 
     fig, spec = chart.chart(country_codes, commands)
 
-    y_pos = spec.get_subplot_params()['nrows'] - 1
+    y_pos = spec._nrows - 1
         
     while y_pos >= 0: 
 
@@ -74,17 +74,20 @@ def build(country_codes, commands):
             
             # plot each country
             for country_code in country_codes:
-            
+                
+                # set default to none
+                data = None 
+                
                 # create a dataframe based on json request
                 country_name, units, data = request.country_data(country_code, storage.get_indicator(command))
 
-                if data: 
+                if data is not None: 
                     
                     # forecast the dataframe
-                    forecast.forecast(data)
-
+                    prediction = forecast.forecast(data)
+                    
                     # plot the axis
-                    ax = chart.plot(ax, data)
+                    ax = chart.plot(ax, prediction)
                     
                     # set the label 
                     ax = chart.set_label(ax, country_name)
@@ -100,9 +103,7 @@ def build(country_codes, commands):
         # count the subplots        
         y_pos -= 1
     
-    fig.show()
-
-    return 'success'
+    return fig.show()
 
 def interpreter(country_codes, commands):
     """Interprets each line passed from the user and routes to next steps for the application"""

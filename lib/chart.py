@@ -33,25 +33,17 @@ def chart(country_codes, commands):
     
     return fig, spec
 
-def plot(country, x, y, ax):
-    """Create a basic chart using x and y columns"""
-
-    # plot
-    ax.plot(x, y, label=country)
-    ax.set_xticks(np.arange(min(x), max(x), int((max(x)-min(x))/5)))
-
-    return ax
-
 def add_axis(fig, spec, y_pos, x_pos):
 
     ax = fig.add_subplot(spec[y_pos, x_pos])
 
     return ax
 
-def plot(ax):
+def plot(ax, series):
 
-    ax = plot(country, df['date'].values.tolist(), df['value'].values.tolist(), ax)
-    
+    ax.plot(series.index, series.values)
+    #ax.set_xticks(np.arange(min(x), max(x), int((max(x)-min(x))/5)))
+
     return ax
 
 def set_label(ax, country_name):

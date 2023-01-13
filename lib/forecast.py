@@ -41,49 +41,40 @@ def calculate_error(actual, forecast):
     
     return errors 
 
-def arima_method(series, horizon):
+def get_arima(series, horizon):
     
-    fit = tsa.ARIMA(series, order=(5, 0, 2)).fit()
-    forecast = fit.forecast(horizon)
-    
-    return fit, forecast
+    forecast = tsa.ARIMA(series, order=(5, 0, 2)).fit().forecast(horizon).rename('arima')
 
-def sarimax_method(series, horizon):
-    
-    fit = tsa.SARIMAX(series, order=(5, 0, 2)).fit(disp=False)
-    forecast = fit.forecast(horizon)
-    
-    return fit, forecast
+    return forecast
 
-def ardl_method(series, horizon):
+def get_sarimax(series, horizon):
     
-    fit = tsa.ARDL(series, lags=horizon).fit()
-    forecast = fit.forecast(horizon)
+    forecast = tsa.SARIMAX(series, order=(5, 0, 2)).fit(disp=False).forecast(horizon).rename('sarimax')
     
-    return fit, forecast
+    return forecast
 
-def simple_expontential_smoothing(series, horizon):
+def get_ardl(series, horizon):
+    
+    forecast = tsa.ARDL(series, lags=horizon).fit().forecast(horizon).rename('ardl')
+ 
+    return forecast
 
-    fit = tsa.SimpleExpSmoothing(series, initialization_method="estimated").fit()
-    forecast = fit.forecast(horizon).rename(r"$\alpha=%s$" % fit.model.params["smoothing_level"])
-   
-    return fit, forecast
+def get_simple_exponential_smoothing(series, horizon):
 
-def holt_method(df, horizon, exponential=False, damped_trend=False):
+    forecast = tsa.SimpleExpSmoothing(series, initialization_method="estimated").fit().forecast(horizon).rename('Simple exponential smoothing')
+
+    return forecast
+
+def get_holt(df, horizon, exponential=False, damped_trend=False):
     
     if exponential:
-        fit = tsa.Holt(df, exponential=True, initialization_method="estimated").fit(smoothing_level=0.8, smoothing_trend=0.2, optimized=False)
-        forecast = fit.forecast(horizon).rename("Exponential trend")
-
+        forecast = tsa.Holt(df, exponential=True, initialization_method="estimated").fit(smoothing_level=0.8, smoothing_trend=0.2, optimized=False).forecast(horizon).rename("exponential trend")
     elif damped_trend:
-        fit = tsa.Holt(df, damped_trend=True, initialization_method="estimated").fit(smoothing_level=0.8, smoothing_trend=0.2)
-        forecast = fit.forecast(horizon).rename("Additive damped trend")
-
+        forecast = tsa.Holt(df, damped_trend=True, initialization_method="estimated").fit(smoothing_level=0.8, smoothing_trend=0.2).forecast(horizon).rename("additive damped trend")
     else:
-        fit = tsa.Holt(df, initialization_method="estimated").fit(smoothing_level=0.8, smoothing_trend=0.2, optimized=False)
-        forecast = fit.forecast(horizon).rename("Holt's linear trend")
-
-    return fit, forecast
+        forecast = tsa.Holt(df, initialization_method="estimated").fit(smoothing_level=0.8, smoothing_trend=0.2, optimized=False).forecast(horizon).rename("Holt's linear trend")
+    
+    return forecast
 
 def search(test, forecasts):
    
@@ -102,35 +93,51 @@ def search(test, forecasts):
                 error = calculate_error(test, forecast)['Root Mean Squared Percentage Error']
                 winner = forecast
     
-    return winner
+    return winner.name
 
-def methods(train, horizon):
+def get_forecasts(train, horizon, select='all'):
     
     # forecasting methods
-    fit, simple = simple_expontential_smoothing(train, horizon)
-    fit, holt = holt_method(train, horizon)
-    fit, holt_exponential = holt_method(train, horizon, exponential=True)
-    fit, holt_damped = holt_method(train, horizon, damped_trend=True)
-    fit, arima = arima_method(train, horizon)
-    fit, sarima = sarimax_method(train, horizon)
-    fit, ardl = ardl_method(train, horizon)
-    
-    return [simple, holt, holt_exponential, holt_damped, arima, sarima, ardl]   
+    simple = get_simple_exponential_smoothing(train, horizon)
+    holt = get_holt(train, horizon)
+    holt_exponential = get_holt(train, horizon, exponential=True)
+    holt_damped = get_holt(train, horizon, damped_trend=True)
+    arima = get_arima(train, horizon)
+    sarima = get_sarimax(train, horizon)
+    ardl = get_ardl(train, horizon)
+
+    forecasts = [simple, holt, holt_exponential, holt_damped, arima, sarima, ardl]
+
+    for method in forecasts:
+        print(method.name)
+        if method.name == select:
+            return method
+        else:
+            return forecasts
 
 def forecast(df):
-   
-    # ignore warnings
+    
+    # ignore warnings from forecasting packages
     warnings.filterwarnings("ignore")
- 
+    
+    # remove unavailable data
+    df.dropna(inplace=True) 
+
     # convert a df to a series
     series = convert_series(df, 'date')
-
-    train, test = split(df)
-
-    forecasts = methods(train, len(test))     
     
+    # split the dataset for training and testing
+    train, test = split(series)
+    
+    # create a list of forecasts
+    forecasts = get_forecasts(train, len(test), select='all')     
+    
+    # find the lowest rmse
     winner = search(test, forecasts)
-
-    df = winner.forecast(df, 5)
     
-    return df
+    print(winner) 
+    
+    # use the winner to forecast the horizon
+    series = get_forecasts(series, len(test), select=winner)
+    
+    return series
