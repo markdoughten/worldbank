@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import matplotlib.gridspec as gridspec
 import math
+import numpy as np
 
 
 def subplots(commands):
@@ -19,22 +20,25 @@ def subplots(commands):
 
     # create the grid layout based on the command inputs 
     spec = gridspec.GridSpec(height, width, figure=fig)
-    return fig, spec
+    return fig, height, spec
 
 
 def chart(commands):
-    fig, spec = subplots(commands)
-    return fig, spec
+    fig, height, spec = subplots(commands)
+    return fig, height, spec
 
 
-def add_axis(fig, spec, y_pos, x_pos):
+def add_window(fig, spec, y_pos, x_pos):
     ax = fig.add_subplot(spec[y_pos, x_pos])
     return fig, ax
 
 
-def plot(fig, ax, series, country_name):
-    ax.plot(series.index, series.values, label=country_name)
-    # ax.set_xticks(np.arange(min(x), max(x), int((max(x)-min(x))/5)))
+def plot(ax, series, country_name):
+    
+    x = series.index
+    y = series.values
+
+    ax.plot(x, y, label=country_name)
 
     return ax
 

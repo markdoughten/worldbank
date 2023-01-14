@@ -1,6 +1,7 @@
 from lib import chart, storage, request, forecast
 from tabulate import tabulate
-
+from matplotlib import pyplot as plt
+import pandas as pd
 
 def separate(command):
     """Separates the original system args into the codes and the indicators"""
@@ -52,21 +53,20 @@ def reset(pos):
 
 
 def build(country_codes, commands):
-    fig, spec = chart.chart(country_codes, commands)
-    y_pos = spec._nrows - 1
+    
+    fig, height, spec = chart.chart(commands)
+    y_pos = height - 1
 
     while y_pos >= 0:
 
         # the starting x_pos is the remainder after filled rows
         x_pos = len(commands) % 3
-
         x_pos = reset(x_pos)
 
         while x_pos >= 0:
 
             command = commands.pop(0)
-
-            ax = chart.add_axis(fig, spec, y_pos, x_pos)
+            fig, ax = chart.add_window(fig, spec, y_pos, x_pos)
 
             # plot each country
             for country_code in country_codes:
@@ -75,17 +75,21 @@ def build(country_codes, commands):
                 country_name, units, data = request.country_data(country_code, storage.get_indicator(command))
 
                 if data is not None:
+                    
                     # forecast the dataframe
                     prediction = forecast.forecast(data)
+                    data = forecast.convert_series(data, 'date')
 
+                    combined = pd.concat([data, prediction], axis=1)   
+                    print(combined)
                     # plot the axis
-                    ax = chart.plot(ax, prediction, country_name)
+                    ax = chart.plot(ax, combined, country_name)
 
                     # set the label 
-                    ax = chart.set_label(ax, units)
+                    ax.set_title(units)
 
                     # change the units 
-                    ax = chart.set_units(ax, units)
+                    ax = chart.set_units(ax, storage.get_units(command))
 
                     # show legend
                     ax.legend()
@@ -95,7 +99,9 @@ def build(country_codes, commands):
         # count the subplots        
         y_pos -= 1
 
-    return fig.show()
+    plt.show()
+
+    return "Build Sucessful"
 
 
 def interpreter(country_codes, commands):
