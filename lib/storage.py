@@ -49,7 +49,7 @@ def get_units(indicator):
     return units
 
 
-def user_help(request='all', sort_by='syntax'):
+def user_help(request='all', sort_by='command'):
     """Return the commands to the user"""
 
     df = pd.DataFrame.from_dict(get_commands(), 'index').fillna("")
