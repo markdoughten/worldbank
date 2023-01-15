@@ -5,12 +5,13 @@ import statsmodels.tsa.api as tsa
 import warnings
 
 
-def convert_series(df, column_name):
+def convert_index(df, column_name):
+    
     # create a series based on a dataframe
     df[column_name] = pd.to_datetime(df[column_name], format='%Y') + pd.offsets.YearEnd(1)
-    series = df.set_index(column_name)
+    df = df.set_index(column_name)
 
-    return series
+    return df
 
 
 def split(df, column_name='value'):
@@ -38,8 +39,8 @@ def calculate_error(actual, result):
     return errors
 
 
-def get_arima(series, horizon):
-    results = tsa.ARIMA(series, order=(5, 0, 2))\
+def get_arima(df, horizon):
+    results = tsa.ARIMA(df, order=(5, 0, 2))\
         .fit()\
         .forecast(horizon)\
         .rename('arima')
@@ -47,16 +48,16 @@ def get_arima(series, horizon):
     return results
 
 
-def get_sarimax(series, horizon):
-    results = tsa.SARIMAX(series, order=(5, 0, 2)).fit(disp=False)\
+def get_sarimax(df, horizon):
+    results = tsa.SARIMAX(df, order=(5, 0, 2)).fit(disp=False)\
         .forecast(horizon)\
         .rename('sarimax')
 
     return results
 
 
-def get_ardl(series, horizon):
-    results = tsa.ARDL(series, lags=horizon)\
+def get_ardl(df, horizon):
+    results = tsa.ARDL(df, lags=horizon)\
         .fit()\
         .forecast(horizon)\
         .rename('ardl')
@@ -64,8 +65,8 @@ def get_ardl(series, horizon):
     return results
 
 
-def get_simple_exponential_smoothing(series, horizon):
-    results = tsa.SimpleExpSmoothing(series, initialization_method="estimated") \
+def get_simple_exponential_smoothing(df, horizon):
+    results = tsa.SimpleExpSmoothing(df, initialization_method="estimated") \
         .fit() \
         .forecast(horizon)\
         .rename('simple exponential smoothing')
@@ -95,6 +96,12 @@ def get_holt(df, horizon, exponential=False, damped_trend=False):
 
     return results
 
+def combine(actuals, prediction):
+    
+    prediction = prediction.to_frame('value')
+    output = pd.concat([actuals, prediction])
+
+    return output
 
 def search(test, forecasts):
     # set error to none
@@ -137,6 +144,7 @@ def get_forecasts(train, horizon, select='all'):
 
 
 def forecast(df):
+    
     # ignore warnings from forecasting packages
     warnings.filterwarnings("ignore")
 
@@ -144,10 +152,10 @@ def forecast(df):
     df.dropna(inplace=True)
 
     # convert a df to a series
-    series = convert_series(df, 'date')
+    df = convert_index(df, 'date')
 
     # split the dataset for training and testing
-    train, test = split(series)
+    train, test = split(df)
 
     # create a list of forecasts
     forecasts = get_forecasts(train, len(test), select='all')
@@ -156,6 +164,9 @@ def forecast(df):
     winner = search(test, forecasts)
 
     # use the winner to forecast the horizon
-    winner = get_forecasts(series, len(test), select=winner)
+    winner = get_forecasts(df, len(test), select=winner)   
+    
+    # convert winner to a dataframe and combne with the original
+    prediction = combine(df, winner)
 
-    return winner
+    return prediction

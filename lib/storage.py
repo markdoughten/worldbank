@@ -9,13 +9,13 @@ def get_commands():
     commands = {
         'codes': {'description': 'country codes', 'syntax': 'codes <letter>'},
         'help': {'description': 'programmed commands', 'syntax': 'help <command>'},
-        'gdp': {'indicator': 'NY.GDP.MKTP.CD', 'syntax': '<country code> gdp', 'units': '$',
+        'gdp': {'indicator': 'NY.GDP.MKTP.CD', 'syntax': 'gdp <country_code>', 'units': '$',
                 'description': 'gross domestic product'},
-        'electricity': {'indicator': '1.1_ACCESS.ELECTRICITY.TOT', 'syntax': '<country code> electricity ',
+        'electricity': {'indicator': '1.1_ACCESS.ELECTRICITY.TOT', 'syntax': 'electricity <country_code>',
                         'units': '%', 'description': 'electricity access'},
-        'population': {'indicator': 'SP.POP.TOTL', 'syntax': '<country code> population',
+        'population': {'indicator': 'SP.POP.TOTL', 'syntax': 'population <country code>',
                        'description': 'population size'},
-        'land': {'indicator': 'AG.LND.AGRI.ZS', 'syntax': '<country code> land', 'units': '%',
+        'land': {'indicator': 'AG.LND.AGRI.ZS', 'syntax': 'land <country code>', 'units': '%',
                  'description': 'land for agriculture'},
         'exit': {'description': 'exit the program', 'syntax': 'exit'}
     }

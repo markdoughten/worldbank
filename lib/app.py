@@ -8,24 +8,24 @@ def separate(command):
 
     commands = storage.get_commands()
     country_codes = []
+    indicators = []
     i = 0
-
+    
     # store the commands and country codes in a list and send the rest of the command back
-    while i < len(command):
-        if command[i] not in commands.keys():
-            country_codes.append(command[i])
-            command.pop(i)
-        i += 1
+    for item in command:
+        if item in commands.keys():
+            indicators.append(item)
+        else:    
+            country_codes.append(item)
 
-    return country_codes, command
+    return country_codes, indicators
 
 
-def codes(command):
+def codes(command, letter):
     # see if a user enters a string to search the countries
-    if len(command) == 2:
-
+    if letter:
         # request the country codes with search
-        country_codes = request.country_codes(command[1])
+        country_codes = request.country_codes(letter)
 
     else:
         country_codes = request.country_codes()
@@ -78,12 +78,9 @@ def build(country_codes, commands):
                     
                     # forecast the dataframe
                     prediction = forecast.forecast(data)
-                    data = forecast.convert_series(data, 'date')
-
-                    combined = pd.concat([data, prediction], axis=1)   
-                    print(combined)
+                    
                     # plot the axis
-                    ax = chart.plot(ax, combined, country_name)
+                    ax = chart.plot(ax, prediction, country_name)
 
                     # set the label 
                     ax.set_title(units)
@@ -101,19 +98,19 @@ def build(country_codes, commands):
 
     plt.show()
 
-    return "Build Sucessful"
+    return "build sucessful"
 
 
 def interpreter(country_codes, commands):
     """Interprets each line passed from the user and routes to next steps for the application"""
 
-    # load the country code mapping
-    if commands[0] == 'codes':
-        return codes(commands)
-
     # available commands
-    elif commands[0] == 'help':
+    if commands[0] == 'help':
         return user_help(commands)
+    
+    # load the country code mapping
+    elif commands[0] == 'codes':
+        return codes(commands, country_codes[0])
 
     # search the commands for the indicator
     elif commands:
@@ -125,6 +122,7 @@ def interpreter(country_codes, commands):
 
 
 def app(sys):
+    
     # separate into country codes and commands
     country_codes, commands = separate(sys.argv)
 
