@@ -1,8 +1,7 @@
-# Documentation
+# World Bank API
 https://datahelpdesk.worldbank.org/knowledgebase/topics/125589-developer-information
 
-# Possible Indicators
-https://api.worldbank.org/v2/en/indicator/?format=json
+# Commands
 
 | command     | description            | syntax                     | units   |
 |:------------|:-----------------------|:---------------------------|:--------|
