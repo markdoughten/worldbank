@@ -21,7 +21,7 @@ def separate(command):
     return country_codes, indicators
 
 
-def codes(command, letter):
+def codes(command, letter=None):
     # see if a user enters a string to search the countries
     if letter:
         # request the country codes with search
@@ -109,8 +109,11 @@ def interpreter(country_codes, commands):
         return user_help(commands)
     
     # load the country code mapping
-    elif commands[0] == 'codes':
-        return codes(commands, country_codes[0])
+    elif commands[0] == 'countries':
+        if len(country_codes) > 0:
+            return codes(commands, country_codes[0])
+        else:
+            return codes(commands)
 
     # search the commands for the indicator
     elif commands:

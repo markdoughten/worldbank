@@ -7,7 +7,7 @@ def get_commands():
 
     # a list of all the commands currently available
     commands = {
-        'codes': {'description': 'country codes', 'syntax': 'codes <letter>'},
+        'countries': {'description': 'country codes', 'syntax': 'countries <letter>'},
         'help': {'description': 'programmed commands', 'syntax': 'help <command>'},
         'gdp': {'indicator': 'NY.GDP.MKTP.CD', 'syntax': 'gdp <country_code>', 'units': '$',
                 'description': 'gross domestic product'},
