@@ -1,48 +1,22 @@
-# customer libraries
-from lib import app, chart, menu, request 
+# custom libraries
+from lib import app
 
 # builtin libraries
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
-import numpy as np 
-import pandas as pd
-import requests
-import json
-import multiprocessing 
-import time
 import sys
 
-def main():
-    
-    # record the created processes       
-    processes = []
-    
-    if sys.argv:
-        
-        # remove the file name
-        sys.argv.pop(0)    
-        
-        if len(sys.argv) == 1:
-            pairs = [sys.argv]
-        else:
-            pairs = app.generate_pairs(sys.argv)
 
-        # loop through command passed to the script
-        for pair in pairs: 
-            
-            # timer
-            start = time.time()
-            
-            # create a process and submit the line to the interpreter
-            p = multiprocessing.Process(target=app.interpreter, args=(pair,))
-            processes.append(p)
-            p.start()
-            
-            # hang main so chart can get produced 
-            time.sleep(time.time()-start)
+def main():
+    if len(sys.argv) >= 2:
+
+        # remove the file name
+        sys.argv.pop(0)
+
+        # send command to app
+        return print(app.app(sys))
+
     else:
-        print('syntax: python main.py <country_code> <indicator>')
-        exit()
- 
+        return print('syntax: python main.py <country_code> <indicator>')
+
+
 if __name__ == '__main__':
     main()

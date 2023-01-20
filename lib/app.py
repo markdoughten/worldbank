@@ -1,109 +1,133 @@
-from lib import chart, menu, request
+from lib import chart, storage, request, forecast
 from tabulate import tabulate
-from pprint import pprint
-
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
-import numpy as np 
+from matplotlib import pyplot as plt
 import pandas as pd
-import requests
-import json
-import multiprocessing 
-import time
 
+def separate(command):
+    """Separates the original system args into the codes and the indicators"""
 
-def get_commands():
-    """Return the commands available with the indicators programmed"""
-    
-    # a list of all the commands currently available
-    commands = {
-        'codes': {'description': 'return the country to country code mapping'}, 
-        'gdp': {'indicator': 'NY.GDP.MKTP.CD', 'syntax': '<country code> gdp', 'units': '$', 'description': 'return the target country\'s recorded gdp per year (USD)'}, 
-        'electricity': {'indicator': '1.1_ACCESS.ELECTRICITY.TOT','syntax': '<country code> electricity ', 'units': '%', 'description': 'return the target country\'s recorded electriciy access as percent of population'}, 
-        'population': {'indicator': 'SP.POP.TOTL','syntax': '<country code> population', 'description': 'return the target country\'s recorded population'}, 
-        'land': {'indicator': 'AG.LND.AGRI.ZS','syntax': '<country code> land', 'units': '%', 'description': 'return the target country\'s % land dedicated to agriculture'}, 
-        'exit': {'description': 'exit the program'}
-        }
-
-    return commands
-
-def generate_pairs(command):
-    """Returns the pairs passed through the command line"""
-    
-    pairs = []
-   
-    country_codes, indicators = seperate(command)
-    
-    # creates pairs for the interpreter and combines help with first command after 
-    if country_codes:
-        for country_code in country_codes: 
-            for indicator in indicators:
-                pairs.append([country_code, indicator])
-    else:
-        if indicators:
-            pairs.append([indicators[0], indicators[1]])
-
-    return pairs
-
-def seperate(command):
-    """Seperates the original system args into the codes and the indicators"""
-
-    commands = get_commands()
+    commands = storage.get_commands()
     country_codes = []
+    indicators = []
+    i = 0
     
-    # search the command and store the country codes in a list and send the rest of the command back
-    while len(command) > 0:
-        if command[0] in commands.keys():
-            break
-        else: 
-            country_codes.append(command[0])
-            command.pop(0)
+    # store the commands and country codes in a list and send the rest of the command back
+    for item in command:
+        if item in commands.keys():
+            indicators.append(item)
+        else:    
+            country_codes.append(item)
+
+    return country_codes, indicators
+
+
+def codes(command, letter=None):
+    # see if a user enters a string to search the countries
+    if letter:
+        # request the country codes with search
+        country_codes = request.country_codes(letter)
+
+    else:
+        country_codes = request.country_codes()
+
+    return tabulate(country_codes, headers='keys', showindex=False)
+
+
+def user_help(commands):
+    try:
+        output = storage.user_help(commands[1])
+    except IndexError:
+        output = storage.user_help('all')
+
+    return output
+
+
+def reset(pos):
+    # reset the x_pos once it hits 0
+    if pos == 0:
+        pos = 2
+    else:
+        pos -= 1
+
+    return pos
+
+
+def build(country_codes, commands):
     
-    return country_codes, command
- 
-def interpreter(pair):
+    fig, height, spec = chart.chart(commands)
+    y_pos = height - 1
+
+    while y_pos >= 0:
+
+        # the starting x_pos is the remainder after filled rows
+        x_pos = len(commands) % 3
+        x_pos = reset(x_pos)
+
+        while x_pos >= 0:
+
+            command = commands.pop(0)
+            fig, ax = chart.add_window(fig, spec, y_pos, x_pos)
+
+            # plot each country
+            for country_code in country_codes:
+
+                # create a dataframe based on json request
+                country_name, units, data = request.country_data(country_code, storage.get_indicator(command))
+
+                if data is not None:
+                    
+                    # forecast the dataframe
+                    prediction = forecast.forecast(data)
+                    
+                    # plot the axis
+                    ax = chart.plot(ax, prediction, country_name)
+
+                    # set the label 
+                    ax.set_title(units)
+
+                    # change the units 
+                    ax = chart.set_units(ax, storage.get_units(command))
+
+                    # show legend
+                    ax.legend()
+
+            x_pos -= 1
+
+        # count the subplots        
+        y_pos -= 1
+
+    plt.show()
+
+    return "build sucessful"
+
+
+def interpreter(country_codes, commands):
     """Interprets each line passed from the user and routes to next steps for the application"""
 
-    commands = get_commands()
-   
-    # load the country code mapping
-    if pair[0] == 'codes':
-       
-        # request the country codes
-        country_codes = request.country_codes()
-       
-        print(tabulate(country_codes, headers='keys', showindex=False))        
-    
-        return
-   
     # available commands
-    elif pair[0] == 'help':
-       
-        try: 
-            pprint(menu.user_help(pair[1]))
-        except IndexError:
-            pprint(menu.user_help('all'))
-        
-        return
+    if commands[0] == 'help':
+        return user_help(commands)
     
+    # load the country code mapping
+    elif commands[0] == 'countries':
+        if len(country_codes) > 0:
+            return codes(commands, country_codes[0])
+        else:
+            return codes(commands)
+
     # search the commands for the indicator
-    elif pair[1] in commands:
-        
-        # get the list
-        indicator = commands[pair[1]]['indicator']
-        
-        # handle no indicator    
-        try:
-            units = commands[pair[1]]['units']
-        except KeyError:
-            units = ''
-            
-        # generate the chart
-        chart.create_chart(pair[0], indicator, units)
+    elif commands:
+        return build(country_codes, commands)
 
+    # error output
     else:
-       # provide the help command
-       print('try : help <command> or : help')
-        
-    return
+        return 'try : help <command> or : help'
 
+
+def app(sys):
+    
+    # separate into country codes and commands
+    country_codes, commands = separate(sys.argv)
+
+    # create a process and submit the line to the interpreter
+    return interpreter(country_codes, commands)

@@ -1,36 +1,55 @@
-# customer libraries
-from lib import app, chart, menu, request 
-
 # builtin libraries
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
-import numpy as np 
-import pandas as pd
-import requests
-import json
-import multiprocessing 
-import time
+import matplotlib.gridspec as gridspec
+import math
+import numpy as np
 
-def create_chart(country_code, indicator, units):
 
-    # create a dataframe based on json request
-    title, df, x, y = request.country_data(country_code, indicator)
-               
-    # call the chart function to build the chart
-    chart(title, x, y, units) 
+def subplots(commands):
+    # set the parameters
+    height = math.ceil(len(commands) / 3)
+    width = len(commands)
+
+    # adjust the width for small subplots 
+    if width < 3:
+        fig = plt.figure(figsize=(width * 5, height * 4))
+    else:
+        fig = plt.figure(figsize=(15, height * 4))
+        width = 3
+
+    # create the grid layout based on the command inputs 
+    spec = gridspec.GridSpec(height, width, figure=fig)
+    return fig, height, spec
+
+
+def chart(commands):
+    fig, height, spec = subplots(commands)
+    return fig, height, spec
+
+
+def add_window(fig, spec, y_pos, x_pos):
+    ax = fig.add_subplot(spec[y_pos, x_pos])
+    return fig, ax
+
+
+def plot(ax, series, country_name):
     
-    return
+    x = series.index
+    y = series.values
 
-def chart(title, x, y, units):
-    """Create a basic chart using x and y columns"""
+    ax.plot(x, y, label=country_name)
 
-    # instantiating a class     
-    fig, ax = plt.subplots()
-    
-    # plot
-    ax.plot(x, y)
-    ax.set_xticks(np.arange(min(x), max(x), 10))
-    
+    return ax
+
+
+def set_label(ax, country_name):
+    ax.set_title(country_name)
+
+    return ax
+
+
+def set_units(ax, units):
     # units
     if units == '$':
         ax.yaxis.set_major_formatter(currency)
@@ -39,29 +58,26 @@ def chart(title, x, y, units):
     else:
         ax.yaxis.set_major_formatter(standard)
 
-    # plot attributes
-    plt.title(title)
-    plt.show()
+    return ax
 
-    return
 
 def currency(x, pos):
     """Format the currency values for the chart"""
-    
-    if x >= 1e12:    
-        x = '${:1.1f}T'.format(x*1e-12)
+
+    if x >= 1e12:
+        x = '${:1.1f}T'.format(x * 1e-12)
     elif x >= 1e9:
-        x = '${:1.1f}B'.format(x*1e-9)
+        x = '${:1.1f}B'.format(x * 1e-9)
     else:
-        x = '${:1.1f}M'.format(x*1e-6)
+        x = '${:1.1f}M'.format(x * 1e-6)
     return x
+
 
 def standard(x, pos):
     """Format regular values"""
-    
-    if x >= 1e9:    
-        x = '{:1.1f}B'.format(x*1e-9)
-    else:
-        x = '{:1.1f}M'.format(x*1e-6)
-    return x
 
+    if x >= 1e9:
+        x = '{:1.1f}B'.format(x * 1e-9)
+    else:
+        x = '{:1.1f}M'.format(x * 1e-6)
+    return x

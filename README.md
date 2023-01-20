@@ -1,12 +1,16 @@
-# Documentation
+# World Bank API
 https://datahelpdesk.worldbank.org/knowledgebase/topics/125589-developer-information
 
-# Possible Indicators
-https://api.worldbank.org/v2/en/indicator/?format=json
+# Commands
 
-| Indicator     | Command | 
-| ----------- | ----------- |
-| 1.1_ACCESS.ELECTRICITY.TOT| electricity|
-| NY.GDP.MKTP.CD | gdp|
-| SP.POP.TOTL | population|
-| AG.LND.AGRI.ZS | land|
+| command     | description            | syntax                     | units   |
+|:------------|:-----------------------|:---------------------------|:--------|
+| countries   | country codes          | codes <letter>             |         |
+| electricity | electricity access     | electricity <country_code> | %       |
+| exit        | exit the program       | exit                       |         |
+| gdp         | gross domestic product | gdp <country_code>         | $       |
+| help        | programmed commands    | help <command>             |         |
+| land        | land for agriculture   | land <country code>        | %       |
+| population  | population size        | population <country code>  |         |
+
+
