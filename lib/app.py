@@ -77,7 +77,7 @@ def build(country_codes, commands):
                 if data is not None:
                     
                     # forecast the dataframe
-                    prediction = forecast.forecast(data)
+                    prediction = forecast.forecast(data, 5)
                     
                     # plot the axis
                     ax = chart.plot(ax, prediction, country_name)

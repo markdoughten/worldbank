@@ -49,7 +49,7 @@ def get_arima(df, horizon):
 
 
 def get_sarimax(df, horizon):
-    results = tsa.SARIMAX(df, order=(5, 0, 2)).fit(disp=False)\
+    results = tsa.SARIMAX(df).fit(disp=False)\
         .forecast(horizon)\
         .rename('sarimax')
 
@@ -125,25 +125,42 @@ def search(test, forecasts):
 
 def get_forecasts(train, horizon, select='all'):
     # forecasting methods
-    simple = get_simple_exponential_smoothing(train, horizon)
-    holt = get_holt(train, horizon)
-    holt_exponential = get_holt(train, horizon, exponential=True)
-    holt_damped = get_holt(train, horizon, damped_trend=True)
-    arima = get_arima(train, horizon)
-    sarima = get_sarimax(train, horizon)
-    ardl = get_ardl(train, horizon)
-
-    forecasts = [simple, holt, holt_exponential, holt_damped, arima, sarima, ardl]
-
-    if select == 'all':
-        return forecasts
+            
+    if select == 'simple exponential smoothing':
+        simple = get_simple_exponential_smoothing(train, horizon)
+        return simple
+    elif select == 'exponential trend':
+        holt_exponential = get_holt(train, horizon, exponential=True)
+        return holt_exponential
+    elif select == 'additive damped trend':
+        holt_damped = get_holt(train, horizon, damped_trend=True)
+        return holt_damped
+    elif select == "Holt's linear trend":
+        holt = get_holt(train, horizon)
+        return holt
+    elif select == 'arima':
+        arima = get_arima(train, horizon)
+        return arima
+    elif select == 'sarimax':
+        sarimax = get_sarimax(train, horizon)
+        return sarimax
+    elif select == 'ardl':
+        ardl = get_ardl(train, horizon)
+        return ardl
     else:
-        for method in forecasts:
-            if method.name == select:
-                return method
+        simple = get_simple_exponential_smoothing(train, horizon)
+        holt = get_holt(train, horizon)
+        holt_exponential = get_holt(train, horizon, exponential=True)
+        holt_damped = get_holt(train, horizon, damped_trend=True)
+        arima = get_arima(train, horizon)
+        sarimax = get_sarimax(train, horizon)
+        ardl = get_ardl(train, horizon)
 
-
-def forecast(df):
+        forecasts = [simple, holt, holt_exponential, holt_damped, arima, sarimax, ardl]
+        
+        return forecasts
+    
+def forecast(df, horizon):
     
     # ignore warnings from forecasting packages
     warnings.filterwarnings("ignore")
@@ -162,9 +179,9 @@ def forecast(df):
 
     # find the lowest rmse
     winner = search(test, forecasts)
-
+    
     # use the winner to forecast the horizon
-    winner = get_forecasts(df, len(test), select=winner)   
+    winner = get_forecasts(df, horizon, select=winner)   
     
     # convert winner to a dataframe and combne with the original
     prediction = combine(df, winner)
