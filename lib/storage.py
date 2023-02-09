@@ -17,7 +17,16 @@ def get_commands():
                        'description': 'population size'},
         'land': {'indicator': 'AG.LND.AGRI.ZS', 'syntax': 'land <country code>', 'units': '%',
                  'description': 'land for agriculture'},
-        'exit': {'description': 'exit the program', 'syntax': 'exit'}
+        'exit': {'description': 'exit the program', 'syntax': 'exit'},
+        'export':{'indicator': 'NE.EXP.GNFS.CD', 'syntax': 'export <country_code>', 'units': '$',
+                'description': 'goods and services exported'},
+        'import':{'indicator': 'NE.IMP.GNFS.CD', 'syntax': 'import <country_code>', 'units': '$',
+                'description': 'goods and services imported'},
+        'internet':{'indicator': 'IT.NET.BBND', 'syntax': 'internet <country_code>', 'units': '',
+                'description': 'broadband subscriptions'},
+        'unemployment':{'indicator': 'SL.UEM.TOTL.NE.ZS', 'syntax': 'unemployment <country_code>', 'units': '%',
+                'description': 'unemployed seeking employment'}
+
     }
 
     return commands
