@@ -70,14 +70,14 @@ def build(country_codes, commands):
 
             # plot each country
             for country_code in country_codes:
-
+                
                 # create a dataframe based on json request
                 country_name, units, data = request.country_data(country_code, storage.get_indicator(command))
 
                 if data is not None:
-                    
+                   
                     # forecast the dataframe
-                    prediction = forecast.forecast(data, 5)
+                    prediction = forecast.forecast(data, 10)
                     
                     # plot the axis
                     ax = chart.plot(ax, prediction, country_name)

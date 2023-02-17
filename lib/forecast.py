@@ -10,7 +10,8 @@ def convert_index(df, column_name):
     # create a series based on a dataframe
     df[column_name] = pd.to_datetime(df[column_name], format='%Y') + pd.offsets.YearEnd(1)
     df = df.set_index(column_name)
-
+    df.index = pd.DatetimeIndex(df.index).to_period('Y')
+    
     return df
 
 
@@ -40,7 +41,7 @@ def calculate_error(actual, result):
 
 
 def get_arima(df, horizon):
-    results = tsa.ARIMA(df, order=(5, 0, 2))\
+    results = tsa.ARIMA(df, order=(1, 1, 0))\
         .fit()\
         .forecast(horizon)\
         .rename('arima')
@@ -100,6 +101,7 @@ def combine(actuals, prediction):
     
     prediction = prediction.to_frame('value')
     output = pd.concat([actuals, prediction])
+    output = output.to_timestamp(freq='Y')
 
     return output
 
@@ -125,7 +127,6 @@ def search(test, forecasts):
 
 def get_forecasts(train, horizon, select='all'):
     # forecasting methods
-            
     if select == 'simple exponential smoothing':
         simple = get_simple_exponential_smoothing(train, horizon)
         return simple
@@ -157,33 +158,33 @@ def get_forecasts(train, horizon, select='all'):
         ardl = get_ardl(train, horizon)
 
         forecasts = [simple, holt, holt_exponential, holt_damped, arima, sarimax, ardl]
-        
+       
         return forecasts
     
-def forecast(df, horizon):
+def forecast(actuals, horizon):
     
     # ignore warnings from forecasting packages
     warnings.filterwarnings("ignore")
 
     # remove unavailable data
-    df.dropna(inplace=True)
+    actuals.dropna(inplace=True)
 
     # convert a df to a series
-    df = convert_index(df, 'date')
-
+    actuals = convert_index(actuals, 'date')
+    
     # split the dataset for training and testing
-    train, test = split(df)
-
+    train, test = split(actuals)
+   
     # create a list of forecasts
     forecasts = get_forecasts(train, len(test), select='all')
 
     # find the lowest rmse
     winner = search(test, forecasts)
-    
-    # use the winner to forecast the horizon
-    winner = get_forecasts(df, horizon, select=winner)   
-    
-    # convert winner to a dataframe and combne with the original
-    prediction = combine(df, winner)
 
+    # use the winner to forecast the horizon
+    winner = get_forecasts(actuals, horizon, select=winner)   
+
+    # convert winner to a dataframe and combine with the original
+    prediction = combine(actuals, winner)
+    
     return prediction
