@@ -15,7 +15,7 @@ def main():
         return print(app.app(sys))
 
     else:
-        return print('syntax: python main.py <country_code> <indicator>')
+        return print('try: python main.py help')
 
 
 if __name__ == '__main__':

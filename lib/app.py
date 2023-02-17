@@ -104,8 +104,11 @@ def build(country_codes, commands):
 def interpreter(country_codes, commands):
     """Interprets each line passed from the user and routes to next steps for the application"""
 
+    if not commands:
+        return 'try: python main.py help'
+    
     # available commands
-    if commands[0] == 'help':
+    elif commands[0] == 'help':
         return user_help(commands)
     
     # load the country code mapping
@@ -114,15 +117,10 @@ def interpreter(country_codes, commands):
             return codes(commands, country_codes[0])
         else:
             return codes(commands)
-
+    
     # search the commands for the indicator
-    elif commands:
-        return build(country_codes, commands)
-
-    # error output
     else:
-        return 'try : help <command> or : help'
-
+        return build(country_codes, commands)
 
 def app(sys):
     
