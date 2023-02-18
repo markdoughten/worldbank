@@ -83,7 +83,7 @@ def build(country_codes, commands):
                     ax = chart.plot(ax, prediction, country_name)
 
                     # set the label 
-                    ax.set_title(units)
+                    ax.set_title(units, wrap=True)
 
                     # change the units 
                     ax = chart.set_units(ax, storage.get_units(command))

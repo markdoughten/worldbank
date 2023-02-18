@@ -15,7 +15,7 @@ def subplots(commands):
     if width < 3:
         fig = plt.figure(figsize=(width * 5, height * 4))
     else:
-        fig = plt.figure(figsize=(15, height * 4))
+        fig = plt.figure(figsize=(40, height * 4))
         width = 3
 
     # create the grid layout based on the command inputs 
@@ -34,7 +34,6 @@ def add_window(fig, spec, y_pos, x_pos):
 
 
 def plot(ax, series, country_name):
-    
     x = series.index
     y = series.values
 
