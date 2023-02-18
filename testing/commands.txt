@@ -1,0 +1,13 @@
+| command      | description                   | syntax                      | units   |
+|:-------------|:------------------------------|:----------------------------|:--------|
+| countries    | country codes                 | countries <letter>          |         |
+| electricity  | electricity access            | electricity <country_code>  | %       |
+| exit         | exit the program              | exit                        |         |
+| export       | goods and services exported   | export <country_code>       | $       |
+| gdp          | gross domestic product        | gdp <country_code>          | $       |
+| help         | programmed commands           | help <command>              |         |
+| import       | goods and services imported   | import <country_code>       | $       |
+| internet     | broadband subscriptions       | internet <country_code>     |         |
+| land         | land for agriculture          | land <country code>         | %       |
+| population   | population size               | population <country code>   |         |
+| unemployment | unemployed seeking employment | unemployment <country_code> | %       |
