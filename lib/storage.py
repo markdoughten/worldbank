@@ -71,4 +71,4 @@ def user_help(request='all', sort_by='command'):
         if request in df.index:
             df = df.filter(like=request, axis=0)
 
-    return df.to_markdown()
+    return df

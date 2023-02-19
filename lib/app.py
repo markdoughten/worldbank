@@ -30,7 +30,7 @@ def codes(command, letter=None):
     else:
         country_codes = request.country_codes()
 
-    return tabulate(country_codes, headers='keys', showindex=False)
+    return country_codes.to_markdown()
 
 
 def user_help(commands):
@@ -39,7 +39,7 @@ def user_help(commands):
     except IndexError:
         output = storage.user_help('all')
 
-    return output
+    return output.to_markdown()
 
 
 def reset(pos):

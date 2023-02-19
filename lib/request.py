@@ -80,11 +80,12 @@ def country_codes(character=None):
         codes.append(code['id'])
     
     # create a dataframe based on json
-    df = pd.DataFrame({'code': codes, 'country': country})
+    df = pd.DataFrame({'country': country}, index=codes)
+    df.index.name = 'code'      
     
     # filter the df based on the user's request
     if character:
         df = df[df['country'].str.lower().str.startswith((character.lower()))]
-           
+    
     return df
 
