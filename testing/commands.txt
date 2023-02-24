@@ -2,7 +2,6 @@
 |:-------------|:------------------------------|:----------------------------|:--------|
 | countries    | country codes                 | countries <letter>          |         |
 | electricity  | electricity access            | electricity <country_code>  | %       |
-| exit         | exit the program              | exit                        |         |
 | export       | goods and services exported   | export <country_code>       | $       |
 | gdp          | gross domestic product        | gdp <country_code>          | $       |
 | help         | programmed commands           | help <command>              |         |

@@ -5,6 +5,9 @@ f_commands="./commands.txt"
 declare -a countries=()
 declare -a commands=()
 counter=0
+RANDOM=$$$(date +%s)
+
+echo $RANDOM
 
 remove() {
   if [ -f $1 ] ; then
@@ -23,12 +26,18 @@ second() {
  
 }
 
-remove $f_commands
-remove $f_countries
-python ../main.py help > $f_commands
-python ../main.py countries > $f_countries
+#remove $f_commands
+#remove $f_countries
+#python ../ > $f_commands
+#python ../main.py countries > $f_countries
 countries=$(second $f_countries ${countries[@]})
 commands=$(second $f_commands ${commands[@]})
 
-echo ${countries[*]}
-echo ${commands[*]}
+
+echo ${commands[0]}
+echo $RANDOM%${#commands[@]}
+
+select_countries=${countries[ $RANDOM % ${#countries[@]} ]}
+select_commands=${commands[$RANDOM % ${#commands[@]}]}
+
+#echo $select_countries
