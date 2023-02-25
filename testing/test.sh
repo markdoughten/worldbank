@@ -4,19 +4,12 @@ f_countries="./countries.txt"
 f_commands="./commands.txt"
 declare -a countries=()
 declare -a commands=()
-counter=0
+declare -a random_countries=()
+declare -a random_commands=()
 RANDOM=$$$(date +%s)
 
-echo $RANDOM
-
-remove() {
-  if [ -f $1 ] ; then
-    rm $1
-  fi
-}
-
 second() {
-  
+  local arr
   arr=($@)  
   while read -r line
   do
@@ -26,18 +19,26 @@ second() {
  
 }
 
-#remove $f_commands
-#remove $f_countries
-#python ../ > $f_commands
+random() {
+  local arr
+  local index
+  arr=($@)  
+  for index in $(shuf -i 0-$(( ${#arr[@]} - 1 )) -n $1)
+  do
+      echo ${arr[$index]}
+  done
+}
+
+#python ../main.py help > $f_commands
 #python ../main.py countries > $f_countries
 countries=$(second $f_countries ${countries[@]})
 commands=$(second $f_commands ${commands[@]})
+IFS=' ' read -r -a commands <<< "${commands[0]}"
+IFS=' ' read -r -a countries <<< "${countries[0]}"
+N=5
+random_commands=$(random $N ${commands[@]})
+N=3
+random_countries=$(random $N ${countries[@]})
 
-
-echo ${commands[0]}
-echo $RANDOM%${#commands[@]}
-
-select_countries=${countries[ $RANDOM % ${#countries[@]} ]}
-select_commands=${commands[$RANDOM % ${#commands[@]}]}
-
-#echo $select_countries
+echo $random_countries
+echo $random_commands
