@@ -2,6 +2,7 @@ from lib import chart, storage, request, forecast
 from tabulate import tabulate
 from matplotlib import pyplot as plt
 import pandas as pd
+import random
 
 def separate(command):
     """Separates the original system args into the codes and the indicators"""
@@ -96,7 +97,7 @@ def build(country_codes, commands):
         # count the subplots        
         y_pos -= 1
 
-    plt.show()
+    plt.savefig(f'./images/{str(random.randint(0, 100000))}.png')
 
     return "build sucessful"
 

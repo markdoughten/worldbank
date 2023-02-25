@@ -23,7 +23,7 @@ random() {
   local arr
   local index
   arr=($@)  
-  for index in $(shuf -i 0-$(( ${#arr[@]} - 1 )) -n $1)
+  for index in $(shuf -i 0-$(( ${#arr[@]} - 1 )) -n 3)
   do
       echo ${arr[$index]}
   done
@@ -35,10 +35,15 @@ countries=$(second $f_countries ${countries[@]})
 commands=$(second $f_commands ${commands[@]})
 IFS=' ' read -r -a commands <<< "${commands[0]}"
 IFS=' ' read -r -a countries <<< "${countries[0]}"
-N=5
-random_commands=$(random $N ${commands[@]})
-N=3
-random_countries=$(random $N ${countries[@]})
 
-echo $random_countries
-echo $random_commands
+i=0
+while [[ $i -lt 1 ]]
+do 
+  random_commands=$(random $N ${commands[@]})
+  random_countries=$(random $N ${countries[@]})
+  ((i++))
+  echo $random_countries $random_commands  
+  python ../main.py $random_countries $random_commands
+done  
+
+
