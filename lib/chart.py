@@ -77,6 +77,8 @@ def standard(x, pos):
 
     if x >= 1e9:
         x = '{:1.1f}B'.format(x * 1e-9)
-    else:
+    elif x >= 1e6:
         x = '{:1.1f}M'.format(x * 1e-6)
+    else:
+        x = '{:1.1f}K'.format(x * 1e-3)
     return x
