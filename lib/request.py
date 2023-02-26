@@ -16,7 +16,10 @@ def get_url(country_code, indicator):
 def get_data(url):
     """Send GET request to the Word Bank API based on URL"""
      
-    response = requests.get(url).json()
+    try:
+        response = requests.get(url).json()
+    except:
+        return None
 
     if response[0]['total'] == 0:
         return None 
@@ -61,7 +64,7 @@ def country_data(country_code, indicator):
         # create a dataframe based on json
         df = pd.DataFrame({'date': x, 'value': y})   
         
-        return country_name, units, df
+        return {'country_name': country_name, 'units': units, 'data': df}
 
     return None
 
@@ -75,17 +78,23 @@ def country_codes(character=None):
     codes = []
  
     # store the country and country code
-    for code in country_codes[1]:
-        country.append(code['name'])
-        codes.append(code['id'])
+    if country_codes:
+        for code in country_codes[1]:
+            country.append(code['name'])
+            codes.append(code['id'])
+        
+        # create a dataframe based on json
+        df = pd.DataFrame({'country': country}, index=codes)
+        df.index.name = 'code'      
+        
+        # filter the df based on the user's request
+        if character:
+            df = df[df['country'].str.lower().str.startswith((character.lower()))]
+        
+        if df.empty:
+            return f"no countries start with {character.lower()}"
     
-    # create a dataframe based on json
-    df = pd.DataFrame({'country': country}, index=codes)
-    df.index.name = 'code'      
-    
-    # filter the df based on the user's request
-    if character:
-        df = df[df['country'].str.lower().str.startswith((character.lower()))]
-    
-    return df
+        return df.to_markdown()
+    else:
+        return "countries codes not available at the moment"
 

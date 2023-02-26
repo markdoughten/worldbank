@@ -2,6 +2,7 @@ from lib import chart, storage, request, forecast
 from tabulate import tabulate
 from matplotlib import pyplot as plt
 import pandas as pd
+import random
 
 def separate(command):
     """Separates the original system args into the codes and the indicators"""
@@ -30,7 +31,7 @@ def codes(command, letter=None):
     else:
         country_codes = request.country_codes()
 
-    return country_codes.to_markdown()
+    return country_codes
 
 
 def user_help(commands):
@@ -51,6 +52,14 @@ def reset(pos):
 
     return pos
 
+def display(fig, ax):
+
+    if ax.lines:
+        plt.tight_layout()
+        plt.show()
+        return "build sucessful"
+    else:
+        return "no data"
 
 def build(country_codes, commands):
     
@@ -72,18 +81,18 @@ def build(country_codes, commands):
             for country_code in country_codes:
                 
                 # create a dataframe based on json request
-                country_name, units, data = request.country_data(country_code, storage.get_indicator(command))
+                data = request.country_data(country_code, storage.get_indicator(command))
 
-                if data is not None:
-                   
+                if data:
+                    
                     # forecast the dataframe
-                    prediction = forecast.forecast(data, 10)
+                    prediction = forecast.forecast(data['data'], 10)
                     
                     # plot the axis
-                    ax = chart.plot(ax, prediction, country_name)
+                    ax = chart.plot(ax, prediction, data['country_name'])
 
                     # set the label 
-                    ax.set_title(units, wrap=True)
+                    ax.set_title(data['units'], wrap=True)
 
                     # change the units 
                     ax = chart.set_units(ax, storage.get_units(command))
@@ -95,12 +104,9 @@ def build(country_codes, commands):
 
         # count the subplots        
         y_pos -= 1
-
-    plt.show()
-
-    return "build sucessful"
-
-
+    
+    return display(fig, ax)
+    
 def interpreter(country_codes, commands):
     """Interprets each line passed from the user and routes to next steps for the application"""
 
