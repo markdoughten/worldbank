@@ -23,7 +23,7 @@ random() {
   local arr
   local index
   arr=($@)  
-  for index in $(shuf -i 0-$(( ${#arr[@]} - 1 )) -n 1)
+  for index in $(shuf -i 0-$(( ${#arr[@]} - 1 )) -n 2)
   do
       echo ${arr[$index]}
   done
@@ -41,9 +41,9 @@ while [[ $i -lt 1 ]]
 do 
   random_commands=$(random $N ${commands[@]})
   random_countries=$(random $N ${countries[@]})
-  ((i++))
   echo $random_countries $random_commands  
   python main.py $random_countries $random_commands
+  ((i++))
 done  
 
 

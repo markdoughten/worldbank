@@ -85,21 +85,26 @@ def build(country_codes, commands):
 
                 if data:
                     
-                    # forecast the dataframe
-                    prediction = forecast.forecast(data['data'], 10)
+                    # forecast the dataframe skip errors
+                    try:
+                        prediction = forecast.forecast(data['data'], 10)
+
+                        # plot the axis
+                        ax = chart.plot(ax, prediction, data['country_name'])
+
+                        # set the label 
+                        ax.set_title(data['units'], wrap=True)
+
+                        # change the units 
+                        ax = chart.set_units(ax, storage.get_units(command))
+
+                        # show legend
+                        ax.legend()
+
+                    except:
+                        pass
                     
-                    # plot the axis
-                    ax = chart.plot(ax, prediction, data['country_name'])
-
-                    # set the label 
-                    ax.set_title(data['units'], wrap=True)
-
-                    # change the units 
-                    ax = chart.set_units(ax, storage.get_units(command))
-
-                    # show legend
-                    ax.legend()
-
+ 
             x_pos -= 1
 
         # count the subplots        
