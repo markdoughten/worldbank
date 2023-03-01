@@ -84,22 +84,31 @@ def build(country_codes, commands):
                 data = request.country_data(country_code, storage.get_indicator(command))
 
                 if data:
+                   
+                    if data['data']['value'].any():
+                        
+                        # get the units    
+                        units = storage.get_units(command)     
+                        
+                        # forecast the dataframe skip errors
+                        prediction = forecast.forecast(data['data'], 10, units)
+
+                        # plot the axis
+                        ax = chart.plot(ax, prediction, data['country_name'])
+
+                        # set the label 
+                        ax.set_title(data['units'], wrap=True)
+
+                        # change the units 
+                        ax = chart.set_units(ax, units)
+
+                        # show legend
+                        ax.legend()
+
+                    else:
+                        pass
                     
-                    # forecast the dataframe
-                    prediction = forecast.forecast(data['data'], 10)
-                    
-                    # plot the axis
-                    ax = chart.plot(ax, prediction, data['country_name'])
-
-                    # set the label 
-                    ax.set_title(data['units'], wrap=True)
-
-                    # change the units 
-                    ax = chart.set_units(ax, storage.get_units(command))
-
-                    # show legend
-                    ax.legend()
-
+ 
             x_pos -= 1
 
         # count the subplots        
