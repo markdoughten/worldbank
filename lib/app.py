@@ -84,10 +84,14 @@ def build(country_codes, commands):
                 data = request.country_data(country_code, storage.get_indicator(command))
 
                 if data:
-                    
-                    # forecast the dataframe skip errors
-                    try:
-                        prediction = forecast.forecast(data['data'], 10)
+                   
+                    if data['data']['value'].any():
+                        
+                        # get the units    
+                        units = storage.get_units(command)     
+                        
+                        # forecast the dataframe skip errors
+                        prediction = forecast.forecast(data['data'], 10, units)
 
                         # plot the axis
                         ax = chart.plot(ax, prediction, data['country_name'])
@@ -96,12 +100,12 @@ def build(country_codes, commands):
                         ax.set_title(data['units'], wrap=True)
 
                         # change the units 
-                        ax = chart.set_units(ax, storage.get_units(command))
+                        ax = chart.set_units(ax, units)
 
                         # show legend
                         ax.legend()
 
-                    except:
+                    else:
                         pass
                     
  

@@ -160,8 +160,15 @@ def get_forecasts(train, horizon, select='all'):
         forecasts = [simple, holt, holt_exponential, holt_damped, arima, sarimax, ardl]
        
         return forecasts
+
+def percentage(df):
+
+    # cap % forecast at 100    
+    df.loc[df['value'] >= 100, 'value'] = 100    
+
+    return df
     
-def forecast(actuals, horizon):
+def forecast(actuals, horizon, units):
     
     # ignore warnings from forecasting packages
     warnings.filterwarnings("ignore")
@@ -186,5 +193,8 @@ def forecast(actuals, horizon):
 
     # convert winner to a dataframe and combine with the original
     prediction = combine(actuals, winner)
+        
+    if units == '%':
+        prediction = percentage(prediction)
     
     return prediction
