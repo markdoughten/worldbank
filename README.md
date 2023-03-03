@@ -2,13 +2,13 @@
 https://datahelpdesk.worldbank.org/knowledgebase/topics/125589-developer-information
 
 # Examples
-"""python main.py usa chn rus gdp internet electricity"""
+'''python main.py usa chn rus gdp internet electricity'''
 
-[1](./docs/images/Figure_1)
+![1](./docs/images/Figure_1)
 
-"""python main.py can mex usa population export import"""
+'''python main.py can mex usa population export import'''
 
-[2](./docs/images/Figure_2)
+![2](./docs/images/Figure_2)
 
 # Commands
 
