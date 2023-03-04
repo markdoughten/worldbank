@@ -1,8 +1,7 @@
 # About
 A forecasting package for World Bank indicators. There are a couple figures generated with the corresponding command below.
 
-If you are not sure, run generate.sh for a randomly generated command.  
-```bash generate.sh```  
+If you are not sure, run generate.sh for a randomly generated command: ```bash generate.sh```  
 
 # Examples
 ```python main.py usa chn rus gdp internet electricity```
