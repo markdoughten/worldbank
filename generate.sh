@@ -29,8 +29,8 @@ random() {
   done
 }
 
-#python ../main.py help > $f_commands
-#python ../main.py countries > $f_countries
+#python ./main.py help > $f_commands
+#python ./main.py countries > $f_countries
 countries=$(second $f_countries ${countries[@]})
 commands=$(second $f_commands ${commands[@]})
 IFS=' ' read -r -a commands <<< "${commands[0]}"
@@ -41,7 +41,7 @@ while [[ $i -lt 1 ]]
 do 
   random_commands=$(random $N ${commands[@]})
   random_countries=$(random $N ${countries[@]})
-  echo $random_countries $random_commands  
+  echo 'python main.py '$random_countries $random_commands  
   python main.py $random_countries $random_commands
   ((i++))
 done  

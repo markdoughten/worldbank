@@ -20,6 +20,7 @@ def subplots(commands):
 
     # create the grid layout based on the command inputs 
     spec = gridspec.GridSpec(height, width, figure=fig)
+    
     return fig, height, spec
 
 

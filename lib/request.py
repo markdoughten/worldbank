@@ -85,7 +85,8 @@ def country_codes(character=None):
         
         # create a dataframe based on json
         df = pd.DataFrame({'country': country}, index=codes)
-        df.index.name = 'code'      
+        df.index.name = 'code'
+        df.index = df.index.str.lower()
         
         # filter the df based on the user's request
         if character:
