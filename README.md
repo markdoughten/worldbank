@@ -10,7 +10,7 @@ If you are not sure, run generate.sh for a randomly generated command: ```bash g
 
 ```python main.py can mex usa population export import```
 
-![2](https://github.com/markdoughten/worldbank/blob/documentation/docs/images/Figure_1.png)
+![2](https://github.com/markdoughten/worldbank/blob/documentation/docs/images/Figure_2.png)
 
 # World Bank
 https://datahelpdesk.worldbank.org/knowledgebase/topics/125589-developer-information
