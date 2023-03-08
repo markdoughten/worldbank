@@ -3,6 +3,9 @@ A forecasting package for World Bank indicators. Here are a couple figures gener
 
 If you are not sure, run generate.sh for a randomly generated command: ```bash generate.sh``` 
 
+# API
+https://datahelpdesk.worldbank.org/knowledgebase/topics/125589-developer-information
+
 # Examples
 ```python main.py usa chn rus gdp internet electricity```
 
@@ -11,9 +14,6 @@ If you are not sure, run generate.sh for a randomly generated command: ```bash g
 ```python main.py can mex usa population export import```
 
 ![2](https://github.com/markdoughten/worldbank/blob/documentation/docs/images/Figure_1.png)
-
-# World Bank
-https://datahelpdesk.worldbank.org/knowledgebase/topics/125589-developer-information
 
 # Commands
 ```python main.py help```
