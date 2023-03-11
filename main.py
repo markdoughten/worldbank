@@ -1,5 +1,5 @@
 # custom libraries
-from lib import app
+from lib.app import App
 
 # builtin libraries
 import sys
@@ -10,6 +10,9 @@ def main():
 
         # remove the file name
         sys.argv.pop(0)
+        
+        # create an app    
+        app = App()        
 
         # send command to app
         return print(app.app(sys))

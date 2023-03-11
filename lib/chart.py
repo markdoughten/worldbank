@@ -26,7 +26,7 @@ class Chart:
 
 
     def chart(self, commands):
-        fig, height, spec = subplots(commands)
+        fig, height, spec = self.subplots(commands)
         return fig, height, spec
 
 
@@ -53,11 +53,11 @@ class Chart:
     def set_units(self, ax, units):
         # units
         if units == '$':
-            ax.yaxis.set_major_formatter(currency)
+            ax.yaxis.set_major_formatter(self.currency)
         elif units == '%':
             ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=100))
         else:
-            ax.yaxis.set_major_formatter(standard)
+            ax.yaxis.set_major_formatter(self.standard)
 
         return ax
 

@@ -28,12 +28,10 @@ class Storage:
 
 
     def get_indicator(self, command):
-        # load the commands
-        commands = get_commands()
-
+        
         # handle no command
         try:
-            indicator = commands[command]['indicator']
+            indicator = self.commands[command]['indicator']
         except KeyError:
             indicator = ''
 
@@ -41,12 +39,10 @@ class Storage:
 
 
     def get_units(self, indicator):
-        # load the commands
-        commands = get_commands()
-
+        
         # handle no indicator    
         try:
-            units = commands[indicator]['units']
+            units = self.commands[indicator]['units']
         except KeyError:
             units = ''
 
@@ -56,7 +52,7 @@ class Storage:
     def user_help(self, request='all', sort_by='command'):
         """Return the commands to the user"""
 
-        df = pd.DataFrame.from_dict(get_commands(), 'index').fillna("")
+        df = pd.DataFrame.from_dict(self.commands, 'index').fillna("")
         df.index.name = 'command'
         df.drop('indicator', axis=1, inplace=True)
 

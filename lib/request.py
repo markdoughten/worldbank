@@ -9,11 +9,11 @@ import json
 
 class Request:
     
-    base_url = 'https://api.worldbank.org/v2/'
+    base_url = 'https://api.worldbank.org/v2'
     
     def get_url(self, country_code, indicator):
         
-        url = f'{self.base_url}country/en/{country_code}/indicator/{indicator}?format=json&per_page=32700'
+        url = f'{self.base_url}/en/country/{country_code}/indicator/{indicator}?format=json&per_page=32700'
         
         return url
 
@@ -39,10 +39,10 @@ class Request:
         url = ''
 
         # send a request to the API with the indicator
-        url = get_url(country_code, indicator)
-        
+        url = self.get_url(country_code, indicator)
+
         # request country data
-        dataset = get_data(url)
+        dataset = self.get_data(url)
        
         if dataset: 
             
@@ -66,7 +66,7 @@ class Request:
             country_name = dataset[1][0]['country']['value']
             
             # create a dataframe based on json
-            df = pd.DataFrame({'date': x, 'value': y})   
+            df = pd.DataFrame({'date': x, 'value': y})
             
             return {'country_name': country_name, 'units': units, 'data': df}
 
@@ -75,7 +75,7 @@ class Request:
     def country_codes(self, character=None):
         
         # request data
-        country_codes = get_data(f'{self.base_url}/country/?format=json&page=1&per_page=2000')
+        country_codes = self.get_data(f'{self.base_url}/country/?format=json&page=1&per_page=2000')
         
         # store the values in a list for the df
         country = []

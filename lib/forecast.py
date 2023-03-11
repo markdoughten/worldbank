@@ -115,12 +115,12 @@ class Forecast:
         for method in forecasts:
             if error is None:
                 # set error
-                error = calculate_error(test, method)['Root Mean Squared Percentage Error']
+                error = self.calculate_error(test, method)['Root Mean Squared Percentage Error']
                 winner = method
             else:
                 # save forecast with the lowest error
-                if error > calculate_error(test, method)['Root Mean Squared Percentage Error']:
-                    error = calculate_error(test, method)['Root Mean Squared Percentage Error']
+                if error > self.calculate_error(test, method)['Root Mean Squared Percentage Error']:
+                    error = self.calculate_error(test, method)['Root Mean Squared Percentage Error']
                     winner = method
 
         return winner.name
@@ -129,34 +129,34 @@ class Forecast:
     def get_forecasts(self, train, horizon, select='all'):
         # forecasting methods
         if select == 'simple exponential smoothing':
-            simple = get_simple_exponential_smoothing(train, horizon)
+            simple = self.get_simple_exponential_smoothing(train, horizon)
             return simple
         elif select == 'exponential trend':
-            holt_exponential = get_holt(train, horizon, exponential=True)
+            holt_exponential = self.get_holt(train, horizon, exponential=True)
             return holt_exponential
         elif select == 'additive damped trend':
-            holt_damped = get_holt(train, horizon, damped_trend=True)
+            holt_damped = self.get_holt(train, horizon, damped_trend=True)
             return holt_damped
         elif select == "Holt's linear trend":
-            holt = get_holt(train, horizon)
+            holt = self.get_holt(train, horizon)
             return holt
         elif select == 'arima':
-            arima = get_arima(train, horizon)
+            arima = self.get_arima(train, horizon)
             return arima
         elif select == 'sarimax':
-            sarimax = get_sarimax(train, horizon)
+            sarimax = self.get_sarimax(train, horizon)
             return sarimax
         elif select == 'ardl':
-            ardl = get_ardl(train, horizon)
+            ardl = self.get_ardl(train, horizon)
             return ardl
         else:
-            simple = get_simple_exponential_smoothing(train, horizon)
-            holt = get_holt(train, horizon)
-            holt_exponential = get_holt(train, horizon, exponential=True)
-            holt_damped = get_holt(train, horizon, damped_trend=True)
-            arima = get_arima(train, horizon)
-            sarimax = get_sarimax(train, horizon)
-            ardl = get_ardl(train, horizon)
+            simple = self.get_simple_exponential_smoothing(train, horizon)
+            holt = self.get_holt(train, horizon)
+            holt_exponential = self.get_holt(train, horizon, exponential=True)
+            holt_damped = self.get_holt(train, horizon, damped_trend=True)
+            arima = self.get_arima(train, horizon)
+            sarimax = self.get_sarimax(train, horizon)
+            ardl = self.get_ardl(train, horizon)
 
             forecasts = [simple, holt, holt_exponential, holt_damped, arima, sarimax, ardl]
            
@@ -178,24 +178,24 @@ class Forecast:
         actuals.dropna(inplace=True)
 
         # convert a df to a series
-        actuals = convert_index(actuals, 'date')
+        actuals = self.convert_index(actuals, 'date')
         
         # split the dataset for training and testing
-        train, test = split(actuals)
+        train, test = self.split(actuals)
        
         # create a list of forecasts
-        forecasts = get_forecasts(train, len(test), select='all')
+        forecasts = self.get_forecasts(train, len(test), select='all')
 
         # find the lowest rmse
-        winner = search(test, forecasts)
+        winner = self.search(test, forecasts)
 
         # use the winner to forecast the horizon
-        winner = get_forecasts(actuals, horizon, select=winner)   
+        winner = self.get_forecasts(actuals, horizon, select=winner)   
 
         # convert winner to a dataframe and combine with the original
-        prediction = combine(actuals, winner)
+        prediction = self.combine(actuals, winner)
             
         if units == '%':
-            prediction = percentage(prediction)
+            prediction = self.percentage(prediction)
         
         return prediction
