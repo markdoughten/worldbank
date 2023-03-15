@@ -9,11 +9,11 @@ https://datahelpdesk.worldbank.org/knowledgebase/topics/125589-developer-informa
 # Examples
 ```python main.py usa chn rus gdp internet electricity```
 
-![1](https://github.com/markdoughten/worldbank/blob/documentation/docs/images/Figure_1.png)
+![1](https://github.com/markdoughten/worldbank/blob/main/docs/images/Figure_1.png)
 
 ```python main.py can mex usa population export import```
 
-![2](https://github.com/markdoughten/worldbank/blob/documentation/docs/images/Figure_2.png)
+![2](https://github.com/markdoughten/worldbank/blob/main/docs/images/Figure_2.png)
 
 # Commands
 ```python main.py help```
