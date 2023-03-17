@@ -134,14 +134,14 @@ class App:
         
         # available commands
         elif commands[0] == 'help':
-            return user_help(commands)
+            return self.user_help(commands)
         
         # load the country code mapping
         elif commands[0] == 'countries':
             if len(country_codes) > 0:
-                return codes(commands, country_codes[0])
+                return self.codes(commands, country_codes[0])
             else:
-                return codes(commands)
+                return self.codes(commands)
         
         # search the commands for the indicator
         else:
