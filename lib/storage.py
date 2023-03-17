@@ -1,9 +1,7 @@
 # builtin libraries
 import pandas as pd
 
-
-def get_commands():
-    """Return the commands available with the indicators programmed"""
+class Storage:
 
     # a list of all the commands currently available
     commands = {
@@ -28,46 +26,40 @@ def get_commands():
 
     }
 
-    return commands
+
+    def get_indicator(self, command):
+        
+        # handle no command
+        try:
+            indicator = self.commands[command]['indicator']
+        except KeyError:
+            indicator = ''
+
+        return indicator
 
 
-def get_indicator(command):
-    # load the commands
-    commands = get_commands()
+    def get_units(self, indicator):
+        
+        # handle no indicator    
+        try:
+            units = self.commands[indicator]['units']
+        except KeyError:
+            units = ''
 
-    # handle no command
-    try:
-        indicator = commands[command]['indicator']
-    except KeyError:
-        indicator = ''
-
-    return indicator
+        return units
 
 
-def get_units(indicator):
-    # load the commands
-    commands = get_commands()
+    def user_help(self, request='all', sort_by='command'):
+        """Return the commands to the user"""
 
-    # handle no indicator    
-    try:
-        units = commands[indicator]['units']
-    except KeyError:
-        units = ''
+        df = pd.DataFrame.from_dict(self.commands, 'index').fillna("")
+        df.index.name = 'command'
+        df.drop('indicator', axis=1, inplace=True)
 
-    return units
+        if request == 'all':
+            df.sort_values(sort_by, inplace=True)
+        else:
+            if request in df.index:
+                df = df.filter(like=request, axis=0)
 
-
-def user_help(request='all', sort_by='command'):
-    """Return the commands to the user"""
-
-    df = pd.DataFrame.from_dict(get_commands(), 'index').fillna("")
-    df.index.name = 'command'
-    df.drop('indicator', axis=1, inplace=True)
-
-    if request == 'all':
-        df.sort_values(sort_by, inplace=True)
-    else:
-        if request in df.index:
-            df = df.filter(like=request, axis=0)
-
-    return df
+        return df
