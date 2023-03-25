@@ -11,7 +11,7 @@ class Forecast:
         # create a series based on a dataframe
         df[column_name] = pd.to_datetime(df[column_name], format='%Y') + pd.offsets.YearEnd(1)
         df = df.set_index(column_name)
-        df.index = pd.DatetimeIndex(df.index).to_period('Y')
+        df.index = pd.DatetimeIndex(df.index).to_period('A')
         
         return df
 
@@ -42,19 +42,22 @@ class Forecast:
 
 
     def get_arima(self, df, horizon):
-        results = tsa.ARIMA(df, order=(1, 1, 0))\
+       
+        results = tsa.ARIMA(df, order=(1, 1, 0), freq=None)\
             .fit()\
             .forecast(horizon)\
             .rename('arima')
-
+        
+        
         return results
 
 
     def get_sarimax(self, df, horizon):
+        
         results = tsa.SARIMAX(df).fit(disp=False)\
             .forecast(horizon)\
             .rename('sarimax')
-
+        
         return results
 
 
@@ -102,7 +105,6 @@ class Forecast:
         
         prediction = prediction.to_frame('value')
         output = pd.concat([actuals, prediction])
-        output = output.to_timestamp(freq='Y')
 
         return output
 
@@ -162,6 +164,17 @@ class Forecast:
            
             return forecasts
 
+    
+        
+    def reset_index(self, actuals, prediction, horizon):
+
+        year = actuals.index[len(actuals.index)-1]+1
+        prediction.index = pd.date_range(str(year), periods=horizon, freq="Y") 
+        prediction.index = pd.DatetimeIndex(prediction.index).to_period('A')
+ 
+        return prediction
+        
+
     def percentage(self, df):
 
         # cap % forecast at 100    
@@ -178,23 +191,24 @@ class Forecast:
         actuals.dropna(inplace=True)
 
         # convert a df to a series
-        actuals = self.convert_index(actuals, 'date')
-        
+        actuals = self.convert_index(actuals, 'date') 
+
         # split the dataset for training and testing
-        train, test = self.split(actuals)
-       
+        train, test = self.split(actuals)    
+    
         # create a list of forecasts
         forecasts = self.get_forecasts(train, len(test), select='all')
 
         # find the lowest rmse
-        winner = self.search(test, forecasts)
+        forecast = self.search(test, forecasts)
 
         # use the winner to forecast the horizon
-        winner = self.get_forecasts(actuals, horizon, select=winner)   
-
+        forecast = self.get_forecasts(actuals, horizon, select=forecast)
+        forecast = self.reset_index(actuals, forecast, horizon)
+        
         # convert winner to a dataframe and combine with the original
-        prediction = self.combine(actuals, winner)
-            
+        prediction = self.combine(actuals, forecast).to_timestamp(freq='A')
+        
         if units == '%':
             prediction = self.percentage(prediction)
         
