@@ -7,11 +7,11 @@ If you are not sure, run generate.sh for a randomly generated command: ```bash g
 https://datahelpdesk.worldbank.org/knowledgebase/topics/125589-developer-information
 
 # Examples
-```python main.py usa chn rus gdp internet electricity```
+```python main.py usa chn rus gdp internet```
 
 ![1](https://github.com/markdoughten/worldbank/blob/documentation/docs/images/Figure_1.png)
 
-```python main.py can mex usa population export import```
+```python main.py can mex usa export import```
 
 ![2](https://github.com/markdoughten/worldbank/blob/documentation/docs/images/Figure_2.png)
 
