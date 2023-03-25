@@ -207,10 +207,7 @@ class Forecast:
         forecast = self.reset_index(actuals, forecast, horizon)
         
         # convert winner to a dataframe and combine with the original
-        prediction = self.combine(actuals, forecast)
-      
-        #  
-        prediction = prediction.to_timestamp(freq='A')
+        prediction = self.combine(actuals, forecast).to_timestamp(freq='A')
         
         if units == '%':
             prediction = self.percentage(prediction)
