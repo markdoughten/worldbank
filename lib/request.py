@@ -25,7 +25,6 @@ class Request:
         except:
             return None
         
-        # need 10 data points
         if response[0]['total'] == 0:
             return None 
 
