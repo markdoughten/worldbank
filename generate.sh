@@ -41,8 +41,8 @@ while [[ $i -lt 1 ]]
 do 
   random_commands=$(random $N ${commands[@]})
   random_countries=$(random $N ${countries[@]})
-  echo 'python main.py '$random_countries $random_commands  
-  python main.py $random_countries $random_commands
+  echo 'python main.py '$random_countries $random_commands > wb.log  
+  python main.py $random_countries $random_commands 
   ((i++))
 done  
 
