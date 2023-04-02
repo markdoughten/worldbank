@@ -3,7 +3,7 @@ from lib.app import App
 
 # builtin libraries
 import sys
-
+import logging
 
 def main():
     if len(sys.argv) >= 2:
@@ -22,4 +22,11 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+   logging.basicConfig(filename='wb.log', level=logging.ERROR)
+
+   try:
+        main()
+   except:
+        logging.error("Exception occurred", exc_info=True)
+        raise
