@@ -1,7 +1,7 @@
 #!/bin/bash
 
-f_countries="./docs/countries.txt"
-f_commands="./docs/commands.txt"
+f_countries="../docs/countries.txt"
+f_commands="../docs/commands.txt"
 declare -a countries=()
 declare -a commands=()
 declare -a random_countries=()

@@ -24,6 +24,9 @@ class Request:
             response = requests.get(url).json()
         except:
             return None
+
+        if 'message' in response[0]:
+            return None
         
         if response[0]['total'] == 0:
             return None 
