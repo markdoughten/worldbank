@@ -101,7 +101,7 @@ class App:
                             units = App.storage.get_units(command)     
                             
                             # forecast the dataframe skip errors
-                            prediction = App.forecast.forecast(data['data'], 10, units)
+                            prediction = App.forecast.forecast(data['data'], int(len(data['data'])*.05), units)
 
                             # plot the axis
                             ax = App.chart.plot(ax, prediction, data['country_name'])
