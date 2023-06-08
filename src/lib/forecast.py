@@ -6,6 +6,15 @@ import warnings
 
 class Forecast:
 
+    def __init__(self):
+        self.forecasts = {'simple exponential smoothing': self.get_simple_exponential_smoothing,
+                      'exponential': self.get_holt, 
+                      'additive damped': self.get_holt, 
+                      "Holt's linear": self.get_holt,
+                      'arima': self.get_arima, 
+                      'sarimax':  self.get_sarimax,
+                      'ardl': self.get_ardl}
+    
     def convert_index(self, df, column_name):
         
         # create a series based on a dataframe
@@ -86,18 +95,18 @@ class Forecast:
                      smoothing_trend=0.2,
                      optimized=False) \
                 .forecast(horizon)\
-                .rename("exponential trend")
+                .rename("exponential")
         elif damped_trend:
             results = tsa.Holt(df, damped_trend=True, initialization_method="estimated") \
                 .fit(smoothing_level=0.8,
                      smoothing_trend=0.2) \
                 .forecast(horizon)\
-                .rename("additive damped trend")
+                .rename("additive damped")
         else:
             results = tsa.Holt(df, initialization_method="estimated") \
                 .fit(smoothing_level=0.8, smoothing_trend=0.2,
                      optimized=False).forecast(horizon)\
-                .rename("Holt's linear trend")
+                .rename("Holt's linear")
 
         return results
 
@@ -130,37 +139,20 @@ class Forecast:
 
     def get_forecasts(self, train, horizon, select='all'):
         # forecasting methods
-        if select == 'simple exponential smoothing':
-            simple = self.get_simple_exponential_smoothing(train, horizon)
-            return simple
-        elif select == 'exponential trend':
-            holt_exponential = self.get_holt(train, horizon, exponential=True)
-            return holt_exponential
-        elif select == 'additive damped trend':
-            holt_damped = self.get_holt(train, horizon, damped_trend=True)
-            return holt_damped
-        elif select == "Holt's linear trend":
-            holt = self.get_holt(train, horizon)
-            return holt
-        elif select == 'arima':
-            arima = self.get_arima(train, horizon)
-            return arima
-        elif select == 'sarimax':
-            sarimax = self.get_sarimax(train, horizon)
-            return sarimax
-        elif select == 'ardl':
-            ardl = self.get_ardl(train, horizon)
-            return ardl
+        if select == 'exponential':
+            return self.forecasts[select](train, horizon, exponential=True)
+        elif select == 'additive damped':
+            return self.forecasts[select](train, horizon, damped_trend=True)
+        elif select != 'all':        
+             return self.forecasts[select](train, horizon)
         else:
-            simple = self.get_simple_exponential_smoothing(train, horizon)
-            holt = self.get_holt(train, horizon)
-            holt_exponential = self.get_holt(train, horizon, exponential=True)
-            holt_damped = self.get_holt(train, horizon, damped_trend=True)
-            arima = self.get_arima(train, horizon)
-            sarimax = self.get_sarimax(train, horizon)
-            ardl = self.get_ardl(train, horizon)
-
-            forecasts = [simple, holt, holt_exponential, holt_damped, arima, sarimax, ardl]
+            forecasts = [self.forecasts['simple exponential smoothing'](train, horizon), 
+                        self.forecasts['exponential'](train, horizon), 
+                        self.forecasts['additive damped'](train, horizon, exponential=True),
+                        self.forecasts["Holt's linear"](train, horizon, damped_trend=True),
+                        self.forecasts['arima'](train, horizon), 
+                        self.forecasts['sarimax'](train, horizon), 
+                        self.forecasts['ardl'](train, horizon)]
            
             return forecasts
 
